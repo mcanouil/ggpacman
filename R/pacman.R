@@ -6,6 +6,7 @@ library(dplyr)
 library(tidyr)
 library(purrr)
 library(mctemplates)
+source("R/ghosts.R")
 
 left_vertical_segments <- tribble(
   ~x, ~y, ~xend, ~yend,
@@ -137,7 +138,7 @@ state_pacman <-tribble(
 #   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
 #   facet_wrap(vars(state), ncol = 4)
 
-pacman <- tribble(
+pacman_moves <- tribble(
   ~x, ~y,
   10, 6,
   10, 6,
@@ -185,12 +186,12 @@ pacman <- tribble(
   mutate(step = 1:n()) %>%
   left_join(y = state_pacman, by = "state")
 
-bonus_points_eaten <- right_join(bonus_points, pacman, by = c("x", "y")) %>%
+bonus_points_eaten <- right_join(bonus_points, pacman_moves, by = c("x", "y")) %>%
   distinct(step, x, y, type) %>%
   mutate(step = map2(step, max(step), ~ seq(.x, .y, 1))) %>%
   unnest("step")
 
-p <- ggplot() +
+base_grid <- ggplot() +
   theme_void(base_family = "xkcd") +
   # theme_light() +
   theme(
@@ -217,7 +218,8 @@ p <- ggplot() +
     colour = "goldenrod2",
     inherit.aes = FALSE,
     show.legend = FALSE
-  ) +
+  )
+p <- base_grid +
   geom_point(
     data = bonus_points_eaten,
     mapping = aes(x = x, y = y, group = step),
@@ -227,15 +229,18 @@ p <- ggplot() +
     show.legend = FALSE
   ) +
   geom_arc_bar(
-    data = pacman,
+    data = pacman_moves,
     mapping = aes(x0 = x, y0 = y, r0 = 0, r = 0.5, start = start, end = end, group = step),
     fill = "goldenrod",
     colour = "goldenrod",
     inherit.aes = FALSE,
     show.legend = FALSE
   ) +
-  labs(caption = "© Mickaël '<i style='color:#21908CFF;'>Coeos</i>' Canouil")
-p
+  labs(caption = "© Mickaël '<i style='color:#21908CFF;'>Coeos</i>' Canouil") +
+  draw_ghost(9, 13, "pink") +
+  draw_ghost(11, 13, "blue") +
+  draw_ghost(9, 14, "red") +
+  draw_ghost(11, 14, "orange")
 
 animate(
   plot = p + transition_manual(step),
@@ -246,4 +251,3 @@ animate(
   bg = "black",
   renderer = gifski_renderer(file = "man/figures/pacman.gif")
 )
-
