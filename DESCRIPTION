@@ -1,0 +1,31 @@
+Package: pacman
+Title: pacman
+Version: 0.1.0
+Authors@R: 
+    person(given = "Mickaël",
+           family = "Canouil",
+           role = c("aut", "cre"),
+           email = "***REMOVED***",
+           comment = c(ORCID = "0000-0002-3396-4549"))
+Description: pacman
+License: GPL-3
+URL: https://github.com/mcanouil/pacman
+BugReports: https://github.com/mcanouil/pacman/issues
+Depends: 
+    R (>= 3.6.0)
+Imports: 
+    gganimate (>= 1.0.5),
+    ggplot2 (>= 3.3.0),
+    ggtext (>= 0.1.0),
+    mctemplates (>= 0.2.6),
+    ggforce,
+    dplyr,
+    tidyr,
+    purrr
+Remotes:
+    github::mcanouil/mctemplates,
+    github::wilkelab/ggtext
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.0.2
