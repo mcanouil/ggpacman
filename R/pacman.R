@@ -115,9 +115,28 @@ bonus_points <- bind_rows(
 
 state_pacman <-tribble(
   ~state, ~start, ~end,
-  "open", 14 / 6 * pi, 4 / 6 * pi,
-  "close", 15 / 3 * pi, 3 / 6 * pi
+  "open_right", 14 / 6 * pi, 4 / 6 * pi,
+  "close_right", 15 / 3 * pi, 3 / 6 * pi,
+  "open_up", 11 / 6 * pi, 1 / 6 * pi,
+  "close_up", 12 / 3 * pi, 0 / 6 * pi,
+  "open_left", 8 / 6 * pi, - 2 / 6 * pi,
+  "close_left", 9 / 3 * pi, - 3 / 6 * pi,
+  "open_down", 5 / 6 * pi, - 5 / 6 * pi,
+  "close_down", 6 / 3 * pi, - 6 / 6 * pi
 )
+
+# ggplot() +
+#   geom_arc_bar(
+#     data = state_pacman,
+#     mapping = aes(x0 = 0, y0 = 0, r0 = 0, r = 0.5, start = start, end = end),
+#     fill = "goldenrod",
+#     colour = "goldenrod",
+#     inherit.aes = FALSE,
+#     show.legend = FALSE
+#   ) +
+#   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
+#   facet_wrap(vars(state), ncol = 4)
+
 pacman <- tribble(
   ~x, ~y,
   10, 6,
@@ -137,7 +156,7 @@ pacman <- tribble(
   5, c(8:25),
   c(4:1), 25,
   1, c(25:18),
-  c(1:4, 3:1), 18,
+  c(1:4, 4:1), 18,
   1, c(18:21),
   c(1:19), 21,
   19, c(22:25),
@@ -151,7 +170,17 @@ pacman <- tribble(
   10, 16
 ) %>%
   unnest(c("x", "y")) %>%
-  mutate(state = list(c("open", "close"))) %>%
+  mutate(
+    state_x = sign(x - lag(x)),
+    state_y = sign(y - lag(y)),
+    state = case_when(
+      (is.na(state_x) | state_x %in% 0) & (is.na(state_y) | state_y %in% 0) ~ list(c("open_right", "close_right")),
+      state_x == 1 & state_y == 0 ~ list(c("open_right", "open_right")),
+      state_x == -1 & state_y == 0 ~ list(c("open_left", "close_left")),
+      state_x == 0 & state_y == -1 ~ list(c("open_down", "close_down")),
+      state_x == 0 & state_y == 1 ~ list(c("open_up", "close_up"))
+    )
+  )  %>%
   unnest("state") %>%
   mutate(step = 1:n()) %>%
   left_join(y = state_pacman, by = "state")
@@ -205,12 +234,11 @@ p <- ggplot() +
     inherit.aes = FALSE,
     show.legend = FALSE
   ) +
-  labs(caption = "© Mickaël '<i style='color:#21908CFF;'>Coeos</i>' Canouil") +
-  transition_manual(step)
-  # transition_time(step)
+  labs(caption = "© Mickaël '<i style='color:#21908CFF;'>Coeos</i>' Canouil")
+p
 
 animate(
-  plot = p,
+  plot = p + transition_manual(step),
   width = 3.7 * 2.54,
   height = 4.7 * 2.54,
   units = "cm",
