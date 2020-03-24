@@ -274,26 +274,69 @@ bonus_points_eaten <- right_join(bonus_points, pacman_moves, by = c("x", "y")) %
   mutate(step = map2(step, max(step), ~ seq(.x, .y, 1))) %>%
   unnest("step")
 
-ghosts_moves <- tribble(
-  ~colour, ~x, ~y,
-  "ghost1", c(9, 9), c(13, 13),
-  "ghost1", 9, 13:14,
-  "ghost1", 10, 14:16,
-  "ghost1", 11:13, 16,
-  "ghost1", 13, 15:11,
-  "ghost1", 12:7, 11,
-  "ghost1", 7, 10:8,
-  "ghost1", 8:9, 8,
-  "ghost1", 9, 7:6,
-  "ghost1", 8:5, 6
-) %>%
-  make_ghost_coord()
+ghosts_vulnerability <- bonus_points_eaten %>%
+  filter(type == "big") %>%
+  group_by(x, y) %>%
+  summarise(step = min(step)) %>%
+  ungroup() %>%
+  (function(data) unlist(map(data[["step"]], ~seq(.x, .x + 30, 1))))()
 
+ghosts_colours <- c(
+  "Blinky" = "red", "Pinky" = "pink", "Inky" = "cyan", "Clyde" = "orange",
+  "Blinky_weak" = "blue", "Pinky_weak" = "blue", "Inky_weak" = "blue", "Clyde_weak" = "blue"
+)
+
+blinky <- tribble(
+  ~colour, ~x, ~y,
+  "Blinky", c(9, 9), c(13, 13),
+  "Blinky", 9, 13:14,
+  "Blinky", 10, 14:16,
+  "Blinky", 11:13, 16,
+  "Blinky", 13, 15:11,
+  "Blinky", 12:7, 11,
+  "Blinky", 7, 10:8,
+  "Blinky", 8:9, 8,
+  "Blinky", 9, 7:6,
+  "Blinky", 8:5, 6,
+  "Blinky", 5, 5:3,
+  "Blinky", 4:3, 3,
+  "Blinky", 3, 4:6,
+  "Blinky", 2:1, 6,
+  "Blinky", 1, 7:8,
+  "Blinky", 2:5, 8,
+  "Blinky", 5, 9:18,
+  "Blinky", 4:1, 18,
+  "Blinky", 1, 18:25
+)
+
+pinky <- tribble(
+  ~colour, ~x, ~y,
+  "Pinky", rep(11, 70), rep(13, 70)
+)
+
+inky <- tribble(
+  ~colour, ~x, ~y,
+  "Inky", rep(9, 70), rep(14, 70)
+)
+
+clyde <- tribble(
+  ~colour, ~x, ~y,
+  "Clyde", rep(11, 70), rep(14, 70)
+)
+
+ghosts_moves <- bind_rows(blinky) %>% # blinky, pinky, inky, clyde
+  make_ghost_coord() %>%
+  mutate(colour = ifelse(step %in% ghosts_vulnerability, paste0(colour, "_weak"), colour))
+
+# max(ghosts_moves$step)==max(pacman_moves$step)
 
 ### Plot time ======================================================================================
 base_grid <- ggplot() +
   theme_void(base_family = "xkcd") +
-  # theme_light() +
+  labs(caption = "© Mickaël '<i style='color:#21908CFF;'>Coeos</i>' Canouil") +
+  # theme_light() + theme(panel.grid.minor = element_blank()) +
+  # scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
+  # scale_y_continuous(breaks = 0:26, sec.axis = dup_axis()) +
   theme(
     plot.caption = element_textbox_simple(halign = 1, colour = "white"),
     plot.caption.position = "plot",
@@ -301,8 +344,6 @@ base_grid <- ggplot() +
     panel.background = element_rect(fill = "black", colour = "black")
   )  +
   coord_fixed(xlim = c(0, 20), ylim = c(0, 26)) +
-  scale_x_continuous(breaks = 0:21) +
-  scale_y_continuous(breaks = 0:26) +
   scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5)) +
   geom_segment(
     data = segments,
@@ -315,7 +356,7 @@ base_grid <- ggplot() +
   geom_point(
     data = bonus_points,
     mapping = aes(x = x, y = y, size = type),
-    colour = "goldenrod2",
+    colour = "goldenrod1",
     inherit.aes = FALSE,
     show.legend = FALSE
   )
@@ -336,8 +377,7 @@ p <- base_grid +
     colour = "yellow",
     inherit.aes = FALSE,
     show.legend = FALSE
-  ) +
-  labs(caption = "© Mickaël '<i style='color:#21908CFF;'>Coeos</i>' Canouil")
+  )
 
 p_ghost <- p +
   geom_polygon(
@@ -348,7 +388,7 @@ p_ghost <- p +
   ) +
   geom_circle(
     data = filter(unnest(ghosts_moves, "eyes"), part == "eye"),
-    mapping = aes(x0 = x0, y0 = y0, r = r),
+    mapping = aes(x0 = x0, y0 = y0, r = r, fill = colour, colour = colour, group = step),
     colour = "white",
     fill = "white",
     inherit.aes = FALSE,
@@ -356,14 +396,14 @@ p_ghost <- p +
   ) +
   geom_circle(
     data = filter(unnest(ghosts_moves, "eyes"), part == "iris"),
-    mapping = aes(x0 = x0, y0 = y0, r = r),
+    mapping = aes(x0 = x0, y0 = y0, r = r, fill = colour, colour = colour, group = step),
     colour = "black",
     fill = "black",
     inherit.aes = FALSE,
     show.legend = FALSE
   ) +
-  scale_fill_manual(values = c("orange", "red", "blue", "pink")) +
-  scale_colour_manual(values = c("orange", "red", "blue", "pink"))
+  scale_fill_manual(breaks = names(ghosts_colours), values = ghosts_colours) +
+  scale_colour_manual(breaks = names(ghosts_colours), values = ghosts_colours)
 
 animate(
   plot = p_ghost + transition_manual(step),
