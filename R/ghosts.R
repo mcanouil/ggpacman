@@ -6,7 +6,7 @@
 # library(purrr)
 # library(gganimate)
 
-make_ghost <- function(data) {
+make_ghost_coord <- function(data) {
   base_ghost <- function() {
     ghost_arc <- unnest(tribble(
       ~x0, ~y0, ~r, ~start, ~end, ~part,
@@ -89,56 +89,56 @@ make_ghost <- function(data) {
   ghost_out
 }
 
-red_ghost <- tribble(
-  ~colour, ~x, ~y,
-  "ghost1", 0:10, 0,
-  "ghost2", c(0, 0, 0:10), 1,
-  "ghost3", 3:10, 0.5,
-  "ghost4", c(10, 10:5), 2
-) %>%
-  make_ghost()
-
-p <- ggplot() +
-  theme_void(base_family = "xkcd") +
-  # theme_light() +
-  theme(
-    plot.caption = element_textbox_simple(halign = 1, colour = "white"),
-    plot.caption.position = "plot",
-    plot.background = element_rect(fill = "black", colour = "black"),
-    panel.background = element_rect(fill = "black", colour = "black")
-  ) +
-  coord_fixed(xlim = c(-1, 11), ylim = c(-1, 3)) +
-  geom_polygon(
-    data = unnest(red_ghost, "body"),
-    mapping = aes(x = x, y = y, fill = colour, colour = colour),
-    inherit.aes = FALSE,
-    show.legend = FALSE
-  ) +
-  geom_circle(
-    data = filter(unnest(red_ghost, "eyes"), part == "eye"),
-    mapping = aes(x0 = x0, y0 = y0, r = r),
-    colour = "white",
-    fill = "white",
-    inherit.aes = FALSE,
-    show.legend = FALSE
-  ) +
-  geom_circle(
-    data = filter(unnest(red_ghost, "eyes"), part == "iris"),
-    mapping = aes(x0 = x0, y0 = y0, r = r),
-    colour = "black",
-    fill = "black",
-    inherit.aes = FALSE,
-    show.legend = FALSE
-  ) +
-  scale_fill_manual(values = c("orange", "red", "blue", "pink")) +
-  scale_colour_manual(values = c("orange", "red", "blue", "pink"))
-
-animate(
-  plot = p + transition_manual(step),
-  width = 3.7 * 2.54,
-  height = 1 * 2.54,
-  units = "cm",
-  res = 120,
-  bg = "black",
-  renderer = gifski_renderer(file = "figures/ghosts.gif")
-)
+# red_ghost <- tribble(
+#   ~colour, ~x, ~y,
+#   "ghost1", 0:10, 0,
+#   "ghost2", c(0, 0, 0:10), 1,
+#   "ghost3", 3:10, 0.5,
+#   "ghost4", c(10, 10:5), 2
+# ) %>%
+#   make_ghost_coord()
+#
+# p <- ggplot() +
+#   theme_void(base_family = "xkcd") +
+#   # theme_light() +
+#   theme(
+#     plot.caption = element_textbox_simple(halign = 1, colour = "white"),
+#     plot.caption.position = "plot",
+#     plot.background = element_rect(fill = "black", colour = "black"),
+#     panel.background = element_rect(fill = "black", colour = "black")
+#   ) +
+#   coord_fixed(xlim = c(-1, 11), ylim = c(-1, 3)) +
+#   geom_polygon(
+#     data = unnest(red_ghost, "body"),
+#     mapping = aes(x = x, y = y, fill = colour, colour = colour),
+#     inherit.aes = FALSE,
+#     show.legend = FALSE
+#   ) +
+#   geom_circle(
+#     data = filter(unnest(red_ghost, "eyes"), part == "eye"),
+#     mapping = aes(x0 = x0, y0 = y0, r = r),
+#     colour = "white",
+#     fill = "white",
+#     inherit.aes = FALSE,
+#     show.legend = FALSE
+#   ) +
+#   geom_circle(
+#     data = filter(unnest(red_ghost, "eyes"), part == "iris"),
+#     mapping = aes(x0 = x0, y0 = y0, r = r),
+#     colour = "black",
+#     fill = "black",
+#     inherit.aes = FALSE,
+#     show.legend = FALSE
+#   ) +
+#   scale_fill_manual(values = c("orange", "red", "blue", "pink")) +
+#   scale_colour_manual(values = c("orange", "red", "blue", "pink"))
+#
+# animate(
+#   plot = p + transition_manual(step),
+#   width = 3.7 * 2.54,
+#   height = 1 * 2.54,
+#   units = "cm",
+#   res = 120,
+#   bg = "black",
+#   renderer = gifski_renderer(file = "figures/ghosts.gif")
+# )
