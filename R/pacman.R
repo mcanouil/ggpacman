@@ -324,11 +324,6 @@ clyde <- tribble(
   "Clyde", rep(11, 70), rep(14, 70)
 )
 
-ghosts_moves <- bind_rows(blinky) %>% # blinky, pinky, inky, clyde
-  make_ghost_coord() %>%
-  mutate(colour = ifelse(step %in% ghosts_vulnerability, paste0(colour, "_weak"), colour))
-
-# max(ghosts_moves$step)==max(pacman_moves$step)
 
 ### Plot time ======================================================================================
 base_grid <- ggplot() +
@@ -337,6 +332,9 @@ base_grid <- ggplot() +
   # theme_light() + theme(panel.grid.minor = element_blank()) +
   # scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
   # scale_y_continuous(breaks = 0:26, sec.axis = dup_axis()) +
+  scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5)) +
+  scale_fill_manual(breaks = names(ghosts_colours), values = ghosts_colours) +
+  scale_colour_manual(breaks = names(ghosts_colours), values = ghosts_colours) +
   theme(
     plot.caption = element_textbox_simple(halign = 1, colour = "white"),
     plot.caption.position = "plot",
@@ -344,7 +342,6 @@ base_grid <- ggplot() +
     panel.background = element_rect(fill = "black", colour = "black")
   )  +
   coord_fixed(xlim = c(0, 20), ylim = c(0, 26)) +
-  scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5)) +
   geom_segment(
     data = segments,
     mapping = aes(x = x, y = y, xend = xend, yend = yend, size = type),
@@ -380,30 +377,34 @@ p <- base_grid +
   )
 
 p_ghost <- p +
-  geom_polygon(
-    data = unnest(ghosts_moves, "body"),
-    mapping = aes(x = x, y = y, fill = colour, colour = colour, group = step),
-    inherit.aes = FALSE,
-    show.legend = FALSE
-  ) +
-  geom_circle(
-    data = filter(unnest(ghosts_moves, "eyes"), part == "eye"),
-    mapping = aes(x0 = x0, y0 = y0, r = r, fill = colour, colour = colour, group = step),
-    colour = "white",
-    fill = "white",
-    inherit.aes = FALSE,
-    show.legend = FALSE
-  ) +
-  geom_circle(
-    data = filter(unnest(ghosts_moves, "eyes"), part == "iris"),
-    mapping = aes(x0 = x0, y0 = y0, r = r, fill = colour, colour = colour, group = step),
-    colour = "black",
-    fill = "black",
-    inherit.aes = FALSE,
-    show.legend = FALSE
-  ) +
-  scale_fill_manual(breaks = names(ghosts_colours), values = ghosts_colours) +
-  scale_colour_manual(breaks = names(ghosts_colours), values = ghosts_colours)
+  map(list(blinky, pinky, inky, clyde), .f = function(data) {
+    ghost_moves <- make_ghost_coord(data) %>%
+      mutate(colour = ifelse(step %in% ghosts_vulnerability, paste0(colour, "_weak"), colour))
+    list(
+      geom_polygon(
+        data = unnest(ghost_moves, "body"),
+        mapping = aes(x = x, y = y, fill = colour, colour = colour, group = step),
+        inherit.aes = FALSE,
+        show.legend = FALSE
+      ),
+      geom_circle(
+        data = filter(unnest(ghost_moves, "eyes"), part == "eye"),
+        mapping = aes(x0 = x0, y0 = y0, r = r, fill = colour, colour = colour, group = step),
+        colour = "white",
+        fill = "white",
+        inherit.aes = FALSE,
+        show.legend = FALSE
+      ),
+      geom_circle(
+        data = filter(unnest(ghost_moves, "eyes"), part == "iris"),
+        mapping = aes(x0 = x0, y0 = y0, r = r, fill = colour, colour = colour, group = step),
+        colour = "black",
+        fill = "black",
+        inherit.aes = FALSE,
+        show.legend = FALSE
+      )
+    )
+  })
 
 animate(
   plot = p_ghost + transition_manual(step),
