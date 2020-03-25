@@ -365,7 +365,7 @@ base_grid <- ggplot() +
     inherit.aes = FALSE
   )
 
-p <- base_grid +
+p_pacman <- base_grid +
   geom_point(
     data = bonus_points_eaten,
     mapping = aes(x = x, y = y, colour = colour, size = colour, group = step),
@@ -377,7 +377,7 @@ p <- base_grid +
     inherit.aes = FALSE
   )
 
-p_ghost <- p +
+p_ghosts <- p_pacman +
   map(list(blinky, pinky, inky, clyde), .f = function(data) {
     ghost_moves <- make_ghost_coord(data) %>%
       mutate(colour = ifelse(step %in% ghosts_vulnerability, paste0(colour, "_weak"), colour))
@@ -396,7 +396,7 @@ p_ghost <- p +
   })
 
 animate(
-  plot = p_ghost + transition_manual(step),
+  plot = p_ghosts + transition_manual(step),
   width = 3.7 * 2.54,
   height = 4.7 * 2.54,
   units = "cm",
