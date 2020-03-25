@@ -1,3 +1,4 @@
+library(here)
 library(ggplot2)
 library(ggforce)
 library(gganimate)
@@ -87,6 +88,8 @@ pacman_grid_coord <- function() {
     right_segments
   ) %>%
     mutate(type = "wall") %>%
+    # mutate(type = list(c("wall", "wall_black"))) %>%
+    # unnest("type") %>%
     bind_rows(tibble(x = 9, y = 15, xend = 11, yend = 15, type = "door"))
 }
 
@@ -145,7 +148,7 @@ make_pacman_coord <- function(data) {
       )
     )  %>%
     unnest("state") %>%
-    mutate(step = 1:n()) %>%
+    mutate(step = 1:n(), colour = "pacman") %>%
     left_join(y = pacman_state(), by = "state")
 }
 
@@ -271,7 +274,10 @@ bonus_points <- bonus_points_coord()
 
 bonus_points_eaten <- right_join(bonus_points, pacman_moves, by = c("x", "y")) %>%
   distinct(step, x, y, type) %>%
-  mutate(step = map2(step, max(step), ~ seq(.x, .y, 1))) %>%
+  mutate(
+    step = map2(step, max(step), ~ seq(.x, .y, 1)),
+    colour = "eaten"
+  ) %>%
   unnest("step")
 
 ghosts_vulnerability <- bonus_points_eaten %>%
@@ -280,11 +286,6 @@ ghosts_vulnerability <- bonus_points_eaten %>%
   summarise(step = min(step)) %>%
   ungroup() %>%
   (function(data) unlist(map(data[["step"]], ~seq(.x, .x + 30, 1))))()
-
-ghosts_colours <- c(
-  "Blinky" = "red", "Pinky" = "pink", "Inky" = "cyan", "Clyde" = "orange",
-  "Blinky_weak" = "blue", "Pinky_weak" = "blue", "Inky_weak" = "blue", "Clyde_weak" = "blue"
-)
 
 blinky <- tribble(
   ~colour, ~x, ~y,
@@ -326,15 +327,25 @@ clyde <- tribble(
 
 
 ### Plot time ======================================================================================
+map_colours <- c(
+  "wall" = "dodgerblue3", "door" = "dodgerblue3",
+  "normal" = "goldenrod1", "big" = "goldenrod1", "eaten" = "black",
+  "pacman" = "yellow",
+  "eye" = "white", "iris" = "black",
+  "Blinky" = "red", "Pinky" = "pink", "Inky" = "cyan", "Clyde" = "orange",
+  "Blinky_weak" = "blue", "Pinky_weak" = "blue", "Inky_weak" = "blue", "Clyde_weak" = "blue"
+)
+
 base_grid <- ggplot() +
   theme_void(base_family = "xkcd") +
+  theme(legend.position = "none") +
   labs(caption = "© Mickaël '<i style='color:#21908CFF;'>Coeos</i>' Canouil") +
   # theme_light() + theme(panel.grid.minor = element_blank()) +
   # scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
   # scale_y_continuous(breaks = 0:26, sec.axis = dup_axis()) +
-  scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5)) +
-  scale_fill_manual(breaks = names(ghosts_colours), values = ghosts_colours) +
-  scale_colour_manual(breaks = names(ghosts_colours), values = ghosts_colours) +
+  scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5, "eaten" = 3)) +
+  scale_fill_manual(breaks = names(map_colours), values = map_colours) +
+  scale_colour_manual(breaks = names(map_colours), values = map_colours) +
   theme(
     plot.caption = element_textbox_simple(halign = 1, colour = "white"),
     plot.caption.position = "plot",
@@ -344,36 +355,26 @@ base_grid <- ggplot() +
   coord_fixed(xlim = c(0, 20), ylim = c(0, 26)) +
   geom_segment(
     data = segments,
-    mapping = aes(x = x, y = y, xend = xend, yend = yend, size = type),
-    colour = "dodgerblue3",
+    mapping = aes(x = x, y = y, xend = xend, yend = yend, size = type, colour = type),
     lineend = "round",
-    inherit.aes = FALSE,
-    show.legend = FALSE
+    inherit.aes = FALSE
   ) +
   geom_point(
     data = bonus_points,
-    mapping = aes(x = x, y = y, size = type),
-    colour = "goldenrod1",
-    inherit.aes = FALSE,
-    show.legend = FALSE
+    mapping = aes(x = x, y = y, size = type, colour = type),
+    inherit.aes = FALSE
   )
 
 p <- base_grid +
   geom_point(
     data = bonus_points_eaten,
-    mapping = aes(x = x, y = y, group = step),
-    colour = "black",
-    size = 3,
-    inherit.aes = FALSE,
-    show.legend = FALSE
+    mapping = aes(x = x, y = y, colour = colour, size = colour, group = step),
+    inherit.aes = FALSE
   ) +
   geom_arc_bar(
     data = pacman_moves,
-    mapping = aes(x0 = x, y0 = y, r0 = 0, r = 0.5, start = start, end = end, group = step),
-    fill = "yellow",
-    colour = "yellow",
-    inherit.aes = FALSE,
-    show.legend = FALSE
+    mapping = aes(x0 = x, y0 = y, r0 = 0, r = 0.5, start = start, end = end, colour = colour, fill = colour, group = step),
+    inherit.aes = FALSE
   )
 
 p_ghost <- p +
@@ -384,24 +385,12 @@ p_ghost <- p +
       geom_polygon(
         data = unnest(ghost_moves, "body"),
         mapping = aes(x = x, y = y, fill = colour, colour = colour, group = step),
-        inherit.aes = FALSE,
-        show.legend = FALSE
+        inherit.aes = FALSE
       ),
       geom_circle(
-        data = filter(unnest(ghost_moves, "eyes"), part == "eye"),
-        mapping = aes(x0 = x0, y0 = y0, r = r, fill = colour, colour = colour, group = step),
-        colour = "white",
-        fill = "white",
-        inherit.aes = FALSE,
-        show.legend = FALSE
-      ),
-      geom_circle(
-        data = filter(unnest(ghost_moves, "eyes"), part == "iris"),
-        mapping = aes(x0 = x0, y0 = y0, r = r, fill = colour, colour = colour, group = step),
-        colour = "black",
-        fill = "black",
-        inherit.aes = FALSE,
-        show.legend = FALSE
+        data = unnest(ghost_moves, "eyes"),
+        mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part, group = step),
+        inherit.aes = FALSE
       )
     )
   })
@@ -413,5 +402,5 @@ animate(
   units = "cm",
   res = 120,
   bg = "black",
-  renderer = gifski_renderer(file = "figures/pacman.gif")
+  renderer = gifski_renderer(file = here("figures", "pacman.gif"))
 )
