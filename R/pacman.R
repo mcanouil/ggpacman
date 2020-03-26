@@ -2,13 +2,13 @@ library(here)
 library(ggplot2)
 library(ggforce)
 library(gganimate)
-library(ggtext)
 library(dplyr)
 library(tidyr)
 library(purrr)
-library(mctemplates)
+library(ggtext)
 
-### Data time ======================================================================================
+
+### Helper functions ===============================================================================
 pacman_grid_coord <- function() {
   left_vertical_segments <- tribble(
     ~x, ~y, ~xend, ~yend,
@@ -119,8 +119,8 @@ bonus_points_coord <- function() {
     unnest("y")
 }
 
-pacman_state <- function() {
-  tribble(
+make_pacman_coord <- function(data) {
+  pacman_state <- tribble(
     ~state, ~start, ~end,
     "open_right", 14 / 6 * pi, 4 / 6 * pi,
     "close_right", 15 / 3 * pi, 3 / 6 * pi,
@@ -131,9 +131,7 @@ pacman_state <- function() {
     "open_down", 5 / 6 * pi, - 5 / 6 * pi,
     "close_down", 6 / 3 * pi, - 6 / 6 * pi
   )
-}
 
-make_pacman_coord <- function(data) {
   data %>%
     unnest(c("x", "y")) %>%
     mutate(
@@ -149,7 +147,7 @@ make_pacman_coord <- function(data) {
     )  %>%
     unnest("state") %>%
     mutate(step = 1:n(), colour = "pacman") %>%
-    left_join(y = pacman_state(), by = "state")
+    left_join(y = pacman_state, by = "state")
 }
 
 make_ghost_coord <- function(data) {
@@ -189,17 +187,39 @@ make_ghost_coord <- function(data) {
   }
 
   eyes_circle <- tribble(
-    ~x0, ~y0, ~r, ~part,
-    1/5, 1/8, 1/8, "eye",
-    -1/5, 1/8, 1/8, "eye",
-    5/20, 1/8, 1/20, "iris",
-    -3/20, 1/8, 1/20, "iris"
-  )
+    ~x0, ~y0, ~r, ~part, ~direction,
+    1/5, 1/8, 1/8, "eye", c("up", "down", "right", "left", "middle"),
+    -1/5, 1/8, 1/8, "eye", c("up", "down", "right", "left", "middle"),
+    5/20, 1/8, 1/20, "iris", "right",
+    -3/20, 1/8, 1/20, "iris", "right",
+    1/5, 1/16, 1/20, "iris", "down",
+    -1/5, 1/16, 1/20, "iris", "down",
+    3/20, 1/8, 1/20, "iris", "left",
+    -5/20, 1/8, 1/20, "iris", "left",
+    1/5, 3/16, 1/20, "iris", "up",
+    -1/5, 3/16, 1/20, "iris", "up",
+    1/5, 1/8, 1/20, "iris", "middle",
+    -1/5, 1/8, 1/20, "iris", "middle"
+  ) %>%
+    unnest("direction")
 
   bg <- base_ghost()
 
   ghost_out <- data %>%
     unnest(c("x", "y")) %>%
+    mutate(
+      state_x = sign(round(x) - lag(round(x))),
+      state_y = sign(round(y) - lag(round(y))),
+      direction = case_when(
+        (is.na(state_x) | state_x %in% 0) & (is.na(state_y) | state_y %in% 0) ~ "middle",
+        state_x == 1 & state_y == 0 ~ "right",
+        state_x == -1 & state_y == 0 ~ "left",
+        state_x == 0 & state_y == -1 ~ "down",
+        state_x == 0 & state_y == 1 ~ "up"
+      )
+    ) %>%
+    unnest("direction") %>%
+    # left_join(y = eyes_circle, by = "direction")
     mutate(state = list(1:4)) %>%
     unnest("state") %>%
     group_by(colour) %>%
@@ -218,12 +238,13 @@ make_ghost_coord <- function(data) {
         }
       ),
       eyes = pmap(
-        .l = list(x, y, noise_x, noise_y),
-        .f = function(.x, .y, .noise_x, .noise_y) {
+        .l = list(x, y, noise_x, noise_y, direction),
+        .f = function(.x, .y, .noise_x, .noise_y, .direction) {
           mutate(
-            .data = eyes_circle,
+            .data = filter(eyes_circle, direction == .direction),
             x0 = x0 + .x + .noise_x,
-            y0 = y0 + .y + .noise_y
+            y0 = y0 + .y + .noise_y,
+            direction = NULL
           )
         }
       ),
@@ -235,11 +256,13 @@ make_ghost_coord <- function(data) {
   ghost_out
 }
 
-pacman_moves <- tribble(
+### Set moves ======================================================================================
+pacman_offset <- 11
+ghosts_offset <- 9
+pacman <- tribble(
   ~x, ~y,
-  10, 6,
-  10, 6,
-  c(10:12), 6,
+  rep(10, pacman_offset), rep(6, pacman_offset),
+  c(11:12), 6,
   13, c(6:3),
   12, 3,
   11, c(3:1),
@@ -266,9 +289,55 @@ pacman_moves <- tribble(
   10, 16,
   10, 16,
   10, 16
-) %>%
-  make_pacman_coord()
+)
 
+blinky <- tribble(
+  ~colour, ~x, ~y,
+  "Blinky", rep(10, ghosts_offset), rep(16, ghosts_offset),
+  "Blinky", 10, 14:15,
+  "Blinky", 11:13, 16,
+  "Blinky", 13, 15:11,
+  "Blinky", 12:7, 11,
+  "Blinky", 7, 10:8,
+  "Blinky", 8:9, 8,
+  "Blinky", 9, 7:6,
+  "Blinky", 8:5, 6,
+  "Blinky", 5, 5:3,
+  "Blinky", 4:3, 3,
+  "Blinky", 3, 4:6,
+  "Blinky", 2:1, 6,
+  "Blinky", 1, 7:8,
+  "Blinky", 2:5, 8,
+  "Blinky", 5, 9:18,
+  "Blinky", 4:1, 18,
+  "Blinky", 1, 19:25,
+  "Blinky", 2:3, 25
+)
+
+pinky <- tribble(
+  ~colour, ~x, ~y,
+  "Pinky", rep(9, ghosts_offset * 2), rep(13, ghosts_offset * 2)
+)
+
+inky <- tribble(
+  ~colour, ~x, ~y,
+  "Inky", rep(10, ghosts_offset * 3), rep(13, ghosts_offset * 3)
+)
+
+clyde <- tribble(
+  ~colour, ~x, ~y,
+  "Clyde", rep(11, ghosts_offset * 4), rep(13, ghosts_offset * 4)
+)
+
+max(make_pacman_coord(pacman)$step)
+max(make_ghost_coord(blinky)$step)
+max(make_ghost_coord(pinky)$step)
+max(make_ghost_coord(inky)$step)
+max(make_ghost_coord(clyde)$step)
+
+
+### Compute coordinates ============================================================================
+pacman_moves <- make_pacman_coord(pacman)
 segments <- pacman_grid_coord()
 bonus_points <- bonus_points_coord()
 
@@ -287,44 +356,6 @@ ghosts_vulnerability <- bonus_points_eaten %>%
   ungroup() %>%
   (function(data) unlist(map(data[["step"]], ~seq(.x, .x + 30, 1))))()
 
-blinky <- tribble(
-  ~colour, ~x, ~y,
-  "Blinky", c(9, 9), c(13, 13),
-  "Blinky", 9, 13:14,
-  "Blinky", 10, 14:16,
-  "Blinky", 11:13, 16,
-  "Blinky", 13, 15:11,
-  "Blinky", 12:7, 11,
-  "Blinky", 7, 10:8,
-  "Blinky", 8:9, 8,
-  "Blinky", 9, 7:6,
-  "Blinky", 8:5, 6,
-  "Blinky", 5, 5:3,
-  "Blinky", 4:3, 3,
-  "Blinky", 3, 4:6,
-  "Blinky", 2:1, 6,
-  "Blinky", 1, 7:8,
-  "Blinky", 2:5, 8,
-  "Blinky", 5, 9:18,
-  "Blinky", 4:1, 18,
-  "Blinky", 1, 18:25
-)
-
-pinky <- tribble(
-  ~colour, ~x, ~y,
-  "Pinky", rep(11, 70), rep(13, 70)
-)
-
-inky <- tribble(
-  ~colour, ~x, ~y,
-  "Inky", rep(9, 70), rep(14, 70)
-)
-
-clyde <- tribble(
-  ~colour, ~x, ~y,
-  "Clyde", rep(11, 70), rep(14, 70)
-)
-
 
 ### Plot time ======================================================================================
 map_colours <- c(
@@ -340,9 +371,6 @@ base_grid <- ggplot() +
   theme_void(base_family = "xkcd") +
   theme(legend.position = "none") +
   labs(caption = "© Mickaël '<i style='color:#21908CFF;'>Coeos</i>' Canouil") +
-  # theme_light() + theme(panel.grid.minor = element_blank()) +
-  # scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
-  # scale_y_continuous(breaks = 0:26, sec.axis = dup_axis()) +
   scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5, "eaten" = 3)) +
   scale_fill_manual(breaks = names(map_colours), values = map_colours) +
   scale_colour_manual(breaks = names(map_colours), values = map_colours) +
@@ -395,6 +423,15 @@ p_ghosts <- p_pacman +
     )
   })
 
+
+p_ghosts
+base_grid +
+  theme_light() + theme(panel.grid.minor = element_blank(), legend.position = "none") +
+  scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
+  scale_y_continuous(breaks = 0:26, sec.axis = dup_axis())
+
+
+### Animate ========================================================================================
 animate(
   plot = p_ghosts + transition_manual(step),
   width = 3.7 * 2.54,
