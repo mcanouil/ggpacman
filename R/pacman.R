@@ -420,7 +420,17 @@ max(make_ghost_coord(pinky)$step)
 inky <- tribble(
   ~x, ~y,
   rep(11, ghosts_offset * 3), rep(13, ghosts_offset * 3),
-  rep(11, 48), rep(13, 48)
+  11, 14,
+  10, 14:16,
+  9:7, 16,
+  7, 15:8,
+  8:9, 8,
+  9, 7:6,
+  10:15, 6,
+  15, 6:3,
+  16:19, 3,
+  19, 2:1,
+  18:6, 1
 ) %>%
   mutate(colour = "Inky")
 max(make_ghost_coord(inky)$step)
