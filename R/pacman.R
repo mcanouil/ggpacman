@@ -119,7 +119,7 @@ bonus_points_coord <- function() {
     unnest("y")
 }
 
-make_pacman_coord <- function(data) {
+compute_pacman_coord <- function(data) {
   pacman_state <- tribble(
     ~state, ~start, ~end,
     "open_right", 14 / 6 * pi, 4 / 6 * pi,
@@ -139,53 +139,63 @@ make_pacman_coord <- function(data) {
       state_y = sign(y - lag(y)),
       state = case_when(
         (is.na(state_x) | state_x %in% 0) & (is.na(state_y) | state_y %in% 0) ~ list(c("open_right", "close_right")),
-        state_x == 1 & state_y == 0 ~ list(c("open_right", "open_right")),
+        state_x == 1 & state_y == 0 ~ list(c("open_right", "close_right")),
         state_x == -1 & state_y == 0 ~ list(c("open_left", "close_left")),
         state_x == 0 & state_y == -1 ~ list(c("open_down", "close_down")),
         state_x == 0 & state_y == 1 ~ list(c("open_up", "close_up"))
       )
     )  %>%
     unnest("state") %>%
-    mutate(step = 1:n(), colour = "pacman") %>%
+    mutate(step = 1:n()) %>%
     left_join(y = pacman_state, by = "state")
 }
 
+compute_points_eaten <- function(bonus_points, pacman_moves) {
+  right_join(bonus_points, pacman_moves, by = c("x", "y")) %>%
+    distinct(step, x, y, type) %>%
+    mutate(
+      step = map2(step, max(step), ~ seq(.x, .y, 1)),
+      colour = "eaten"
+    ) %>%
+    unnest("step")
+}
+
+base_ghost <- function() {
+  ghost_arc <- unnest(tribble(
+    ~x0, ~y0, ~r, ~start, ~end, ~part,
+    0, 0, 0.5, - 1 * pi / 2, 1 * pi / 2, "top",
+    c(-1 / 6, 1 / 6), -0.5 + 1/8, 0.125, pi / 2, 3 * pi / 2, "bottom",
+    -0.5, -0.5 + 1/8, 0.125, 2 * pi / 4, 4 * pi / 4, "bottom",
+    0.5, -0.5 + 1/8, 0.125, - 2 * pi / 4, - 4 * pi / 4, "bottom",
+    c(-1 / 3, 0, 1 / 3), -0.5 + 1/8, 1 / 24, - 1 * pi / 2, 1 * pi / 2, "bottom",
+  ), "x0")
+
+  top <- ggplot() +
+    geom_arc_bar(
+      data = ghost_arc[1, ],
+      mapping = aes(x0 = x0, y0 = y0, r0 = 0, r = r, start = start, end = end)
+    ) +
+    coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1))
+
+  top_polygon <- ggplot_build(top)$data[[1]][, c("x", "y")]
+
+  bottom <- ggplot() +
+    geom_arc_bar(
+      data = ghost_arc[c(5, 3, 2, 4), ],
+      mapping = aes(x0 = x0, y0 = y0, r0 = 0, r = 0.17, start = start, end = end)
+    ) +
+    coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1))
+
+  bottom_polygon <- ggplot_build(bottom)$data[[1]][, c("x", "y")]
+
+  bind_rows(
+    top_polygon[-nrow(top_polygon), ],
+    tibble(x = 0.5, y = -0.5 + 1/8),
+    bottom_polygon
+  )
+}
+
 make_ghost_coord <- function(data) {
-  base_ghost <- function() {
-    ghost_arc <- unnest(tribble(
-      ~x0, ~y0, ~r, ~start, ~end, ~part,
-      0, 0, 0.5, - 1 * pi / 2, 1 * pi / 2, "top",
-      c(-1 / 6, 1 / 6), -0.5 + 1/8, 0.125, pi / 2, 3 * pi / 2, "bottom",
-      -0.5, -0.5 + 1/8, 0.125, 2 * pi / 4, 4 * pi / 4, "bottom",
-      0.5, -0.5 + 1/8, 0.125, - 2 * pi / 4, - 4 * pi / 4, "bottom",
-      c(-1 / 3, 0, 1 / 3), -0.5 + 1/8, 1 / 24, - 1 * pi / 2, 1 * pi / 2, "bottom",
-    ), "x0")
-
-    top <- ggplot() +
-      geom_arc_bar(
-        data = ghost_arc[1, ],
-        mapping = aes(x0 = x0, y0 = y0, r0 = 0, r = r, start = start, end = end)
-      ) +
-      coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1))
-
-    top_polygon <- ggplot_build(top)$data[[1]][, c("x", "y")]
-
-    bottom <- ggplot() +
-      geom_arc_bar(
-        data = ghost_arc[c(5, 3, 2, 4), ],
-        mapping = aes(x0 = x0, y0 = y0, r0 = 0, r = 0.17, start = start, end = end)
-      ) +
-      coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1))
-
-    bottom_polygon <- ggplot_build(bottom)$data[[1]][, c("x", "y")]
-
-    bind_rows(
-      top_polygon[-nrow(top_polygon), ],
-      tibble(x = 0.5, y = -0.5 + 1/8),
-      bottom_polygon
-    )
-  }
-
   eyes_circle <- tribble(
     ~x0, ~y0, ~r, ~part, ~direction,
     1/5, 1/8, 1/8, "eye", c("up", "down", "right", "left", "middle"),
@@ -208,6 +218,8 @@ make_ghost_coord <- function(data) {
   ghost_out <- data %>%
     unnest(c("x", "y")) %>%
     mutate(
+      X0 = x,
+      Y0 = y,
       state_x = sign(round(x) - lag(round(x))),
       state_y = sign(round(y) - lag(round(y))),
       direction = case_when(
@@ -219,7 +231,6 @@ make_ghost_coord <- function(data) {
       )
     ) %>%
     unnest("direction") %>%
-    # left_join(y = eyes_circle, by = "direction")
     mutate(state = list(1:4)) %>%
     unnest("state") %>%
     group_by(colour) %>%
@@ -256,9 +267,65 @@ make_ghost_coord <- function(data) {
   ghost_out
 }
 
+compute_ghost_status <- function(ghost, pacman_moves, bonus_points_eaten) {
+  ghosts_vulnerability <- bonus_points_eaten %>%
+    filter(type == "big") %>%
+    group_by(x, y) %>%
+    summarise(step_init = min(step)) %>%
+    ungroup() %>%
+    mutate(
+      step = map(step_init, ~seq(.x, .x + 30, 1)),
+      vulnerability = TRUE,
+      x = NULL, y = NULL
+    ) %>%
+    unnest("step")
+
+  ghost_out <- left_join(
+    x = make_ghost_coord(ghost),
+    y = pacman_moves %>%
+      mutate(ghost_eaten = TRUE) %>%
+      select(X0 = x, Y0 = y, step, ghost_eaten),
+    by = c("X0", "Y0", "step")
+  ) %>%
+    left_join(y = ghosts_vulnerability, by = "step") %>%
+    mutate(
+      vulnerability = replace_na(vulnerability, FALSE),
+      ghost_name = colour,
+      ghost_eaten = ghost_eaten & vulnerability,
+      colour = ifelse(vulnerability, paste0(ghost_name, "_weak"), colour)
+    )
+
+  pos_eaten_start <- which(ghost_out[["ghost_eaten"]])
+  ghosts_home <- which(ghost_out[["X0"]] == 10 & ghost_out[["Y0"]] == 14)
+  for (ipos in pos_eaten_start) {
+    # if (any(ghosts_home>=ipos)) {
+      pos_eaten_end <- min(ghosts_home[ghosts_home>=ipos])
+      ghost_out[["colour"]][ipos:pos_eaten_end] <- paste0(unique(ghost_out[["ghost_name"]]), "_eaten")
+    # }
+  }
+
+  left_join(
+    x = ghost_out,
+    y = ghost_out %>%
+      filter(step == step_init & grepl("eaten", colour)) %>%
+      mutate(already_eaten = TRUE) %>%
+      select(step_init, already_eaten),
+      by = "step_init"
+  ) %>%
+    mutate(
+      colour = case_when(
+        already_eaten & X0 == 10 & Y0 == 14 ~ paste0(ghost_name, "_eaten"),
+        grepl("weak", colour) & already_eaten ~ ghost_name,
+        TRUE ~ colour
+      )
+    )
+}
+
+
 ### Set moves ======================================================================================
 pacman_offset <- 11
 ghosts_offset <- 9
+
 pacman <- tribble(
   ~x, ~y,
   rep(10, pacman_offset), rep(6, pacman_offset),
@@ -285,88 +352,126 @@ pacman <- tribble(
   15, c(25:13),
   c(15:20, 0:7), 13,
   7, c(14:16),
-  c(8:10), 16,
+  c(8:9), 16,
+  rep(10, 4), rep(16, 4)
+) %>%
+  mutate(colour = "Pac-Man")
+max(compute_pacman_coord(pacman)$step)
+
+blinky <- tribble(
+  ~x, ~y,
+  rep(10, ghosts_offset), rep(16, ghosts_offset),
+  9:7, 16,
+  7, 15:13,
+  6:5, 13,
+  5, 12:8,
+  4, 8,
+  rep(5, 3), rep(8, 3), # dead
+  6, 8,
+  6, 9,
+  7, 9,
+  7, 10,
+  8, 10,
+  8, 11,
+  9, 11,
+  9, 12,
+  10, 12,
+  10, 13,
+  rep(10, 4), rep(14, 4),
+  10, 15, # alive
+  10:13, 16,
+  13, 15:8,
+  12:11, 8,
+  11, 7:6,
+  12:15, 6,
+  15, 6:3,
+  16:17, 3,
+  17, 4:6,
+  17:19, 6,
+  19, 7:8
+) %>%
+  mutate(colour = "Blinky")
+max(make_ghost_coord(blinky)$step)
+
+pinky <- tribble(
+  ~x, ~y,
+  rep(9, ghosts_offset * 2), rep(13, ghosts_offset * 2),
+  9, 14,
+  10, 14:16,
+  11:13, 16,
+  13, 15:11,
+  12:7, 11,
+  7, 10:8,
+  8:9, 8,
+  9, 7:6,
+  8:5, 6,
+  5, 5:3,
+  4:3, 3,
+  3, 4:6,
+  2:1, 6,
+  1, 7:8,
+  2:5, 8,
+  5, 9:18,
+  4:3, 18
+) %>%
+  mutate(colour = "Pinky")
+max(make_ghost_coord(pinky)$step)
+
+inky <- tribble(
+  ~x, ~y,
+  rep(11, ghosts_offset * 3), rep(13, ghosts_offset * 3),
+  rep(11, 48), rep(13, 48)
+) %>%
+  mutate(colour = "Inky")
+max(make_ghost_coord(inky)$step)
+
+clyde <- tribble(
+  ~x, ~y,
+  rep(10, ghosts_offset * 4), rep(13, ghosts_offset * 4),
+  10, 14:16,
+  11, 16,
+  11, 17:18,
+  12:13, 18,
+  13, 19:21,
+  14:15, 21,
+  15, 22:25,
+  16:17, 25, # dead
+  16, 25,
+  15, 25:24,
+  14, 23:22,
+  13, 21:20,
+  12, 19:18,
+  11, 17:16,
+  10, 15,
+  rep(10, 4), rep(14, 4),
+  10, 15, # alive
   10, 16,
   10, 16,
   10, 16
-)
-
-blinky <- tribble(
-  ~colour, ~x, ~y,
-  "Blinky", rep(10, ghosts_offset), rep(16, ghosts_offset),
-  "Blinky", 10, 14:15,
-  "Blinky", 11:13, 16,
-  "Blinky", 13, 15:11,
-  "Blinky", 12:7, 11,
-  "Blinky", 7, 10:8,
-  "Blinky", 8:9, 8,
-  "Blinky", 9, 7:6,
-  "Blinky", 8:5, 6,
-  "Blinky", 5, 5:3,
-  "Blinky", 4:3, 3,
-  "Blinky", 3, 4:6,
-  "Blinky", 2:1, 6,
-  "Blinky", 1, 7:8,
-  "Blinky", 2:5, 8,
-  "Blinky", 5, 9:18,
-  "Blinky", 4:1, 18,
-  "Blinky", 1, 19:25,
-  "Blinky", 2:3, 25
-)
-
-pinky <- tribble(
-  ~colour, ~x, ~y,
-  "Pinky", rep(9, ghosts_offset * 2), rep(13, ghosts_offset * 2)
-)
-
-inky <- tribble(
-  ~colour, ~x, ~y,
-  "Inky", rep(10, ghosts_offset * 3), rep(13, ghosts_offset * 3)
-)
-
-clyde <- tribble(
-  ~colour, ~x, ~y,
-  "Clyde", rep(11, ghosts_offset * 4), rep(13, ghosts_offset * 4)
-)
-
-max(make_pacman_coord(pacman)$step)
-max(make_ghost_coord(blinky)$step)
-max(make_ghost_coord(pinky)$step)
-max(make_ghost_coord(inky)$step)
+) %>%
+  mutate(colour = "Clyde")
 max(make_ghost_coord(clyde)$step)
 
 
-### Compute coordinates ============================================================================
-pacman_moves <- make_pacman_coord(pacman)
+### Setup data and variables =======================================================================
 segments <- pacman_grid_coord()
 bonus_points <- bonus_points_coord()
-
-bonus_points_eaten <- right_join(bonus_points, pacman_moves, by = c("x", "y")) %>%
-  distinct(step, x, y, type) %>%
-  mutate(
-    step = map2(step, max(step), ~ seq(.x, .y, 1)),
-    colour = "eaten"
-  ) %>%
-  unnest("step")
-
-ghosts_vulnerability <- bonus_points_eaten %>%
-  filter(type == "big") %>%
-  group_by(x, y) %>%
-  summarise(step = min(step)) %>%
-  ungroup() %>%
-  (function(data) unlist(map(data[["step"]], ~seq(.x, .x + 30, 1))))()
+pacman_moves <- compute_pacman_coord(pacman)
+bonus_points_eaten <- compute_points_eaten(bonus_points, pacman_moves)
+map_colours <- c(
+  "READY!" = "goldenrod1",
+  "wall" = "dodgerblue3", "door" = "dodgerblue3",
+  "normal" = "goldenrod1", "big" = "goldenrod1", "eaten" = "black",
+  "Pac-Man" = "yellow",
+  "eye" = "white", "iris" = "black",
+  "Blinky" = "red", "Blinky_weak" = "blue", "Blinky_eaten" = "transparent",
+  "Pinky" = "pink", "Pinky_weak" = "blue", "Pinky_eaten" = "transparent",
+  "Inky" = "cyan", "Inky_weak" = "blue", "Inky_eaten" = "transparent",
+  "Clyde" = "orange", "Clyde_weak" = "blue", "Clyde_eaten" = "transparent"
+)
 
 
 ### Plot time ======================================================================================
-map_colours <- c(
-  "wall" = "dodgerblue3", "door" = "dodgerblue3",
-  "normal" = "goldenrod1", "big" = "goldenrod1", "eaten" = "black",
-  "pacman" = "yellow",
-  "eye" = "white", "iris" = "black",
-  "Blinky" = "red", "Pinky" = "pink", "Inky" = "cyan", "Clyde" = "orange",
-  "Blinky_weak" = "blue", "Pinky_weak" = "blue", "Inky_weak" = "blue", "Clyde_weak" = "blue"
-)
-
 base_grid <- ggplot() +
   theme_void(base_family = "xkcd") +
   theme(legend.position = "none") +
@@ -375,7 +480,7 @@ base_grid <- ggplot() +
   scale_fill_manual(breaks = names(map_colours), values = map_colours) +
   scale_colour_manual(breaks = names(map_colours), values = map_colours) +
   theme(
-    plot.caption = element_textbox_simple(halign = 1, colour = "white"),
+    plot.caption = element_textbox_simple(halign = 0.5, colour = "white"),
     plot.caption.position = "plot",
     plot.background = element_rect(fill = "black", colour = "black"),
     panel.background = element_rect(fill = "black", colour = "black")
@@ -391,53 +496,66 @@ base_grid <- ggplot() +
     data = bonus_points,
     mapping = aes(x = x, y = y, size = type, colour = type),
     inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = tibble(x = 10, y = 11, label = "READY!", step = 1:20),
+    mapping = aes(x = x, y = y, label = label, colour = label, group = step),
+    size = 6
   )
 
-p_pacman <- base_grid +
+p_points <- list(
   geom_point(
     data = bonus_points_eaten,
     mapping = aes(x = x, y = y, colour = colour, size = colour, group = step),
     inherit.aes = FALSE
-  ) +
+  )
+)
+
+p_pacman <- list(
   geom_arc_bar(
     data = pacman_moves,
     mapping = aes(x0 = x, y0 = y, r0 = 0, r = 0.5, start = start, end = end, colour = colour, fill = colour, group = step),
     inherit.aes = FALSE
   )
+)
 
-p_ghosts <- p_pacman +
-  map(list(blinky, pinky, inky, clyde), .f = function(data) {
-    ghost_moves <- make_ghost_coord(data) %>%
-      mutate(colour = ifelse(step %in% ghosts_vulnerability, paste0(colour, "_weak"), colour))
-    list(
-      geom_polygon(
-        data = unnest(ghost_moves, "body"),
-        mapping = aes(x = x, y = y, fill = colour, colour = colour, group = step),
-        inherit.aes = FALSE
-      ),
-      geom_circle(
-        data = unnest(ghost_moves, "eyes"),
-        mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part, group = step),
-        inherit.aes = FALSE
-      )
+p_ghosts <- map(.x = list(blinky, pinky, inky, clyde), .f = function(data) {
+  ghost_moves <- compute_ghost_status(
+    ghost = data,
+    pacman_moves = pacman_moves,
+    bonus_points_eaten = bonus_points_eaten
+  )
+  list(
+    geom_polygon(
+      data = unnest(ghost_moves, "body"),
+      mapping = aes(x = x, y = y, fill = colour, colour = colour, group = step),
+      inherit.aes = FALSE
+    ),
+    geom_circle(
+      data = unnest(ghost_moves, "eyes"),
+      mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part, group = step),
+      inherit.aes = FALSE
     )
-  })
+  )
+})
 
+# base_grid +
+#   theme_light() + theme(panel.grid.minor = element_blank(), legend.position = "none") +
+#   scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
+#   scale_y_continuous(breaks = 0:26, sec.axis = dup_axis())
 
-p_ghosts
-base_grid +
-  theme_light() + theme(panel.grid.minor = element_blank(), legend.position = "none") +
-  scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
-  scale_y_continuous(breaks = 0:26, sec.axis = dup_axis())
+# base_grid + p_points + p_pacman + p_ghosts + facet_wrap(vars(step==230))
 
 
 ### Animate ========================================================================================
 animate(
-  plot = p_ghosts + transition_manual(step),
+  plot = base_grid  + p_points + p_pacman+ p_ghosts + transition_manual(step),
   width = 3.7 * 2.54,
   height = 4.7 * 2.54,
   units = "cm",
   res = 120,
   bg = "black",
+  duration = 20,
+  # fps = 24,
   renderer = gifski_renderer(file = here("figures", "pacman.gif"))
 )
