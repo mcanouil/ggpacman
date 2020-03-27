@@ -2,30 +2,30 @@
 % Please edit documentation in R/animate_pacman.R
 \name{animate_pacman}
 \alias{animate_pacman}
-\title{animate_pacman}
+\title{Create a Pac-Man Game GIF}
 \usage{
 animate_pacman(
   pacman,
-  ghosts = list(blinky, pinky, inky, clyde),
+  ghosts,
   file = NULL,
   caption = "&copy; Micka&euml;l '<i style='color:#21908CFF;'>Coeos</i>' Canouil",
   font_family = ""
 )
 }
 \arguments{
-\item{pacman}{something}
+\item{pacman}{A \code{data.frame} with the coordinates of Pac-Man moves.}
 
-\item{ghosts}{something}
+\item{ghosts}{A \code{list}of \code{data.frame} with the coordinates of (each) Ghost moves.}
 
-\item{file}{something}
+\item{file}{File name to save GIF on disk.}
 
-\item{caption}{something}
+\item{caption}{A caption to add below the GIF.}
 
-\item{font_family}{something}
+\item{font_family}{The font family to use for the caption.}
 }
 \value{
-something
+Returns a \code{gif_image} object. See \code{gganimate::gifski_renderer}.
 }
 \description{
-animate_pacman
+Create a Pac-Man Game GIF
 }
