@@ -4,3 +4,4 @@
 ^R/pacman\.R$
 ^figures$
 ^data-raw$
+^\.github$
