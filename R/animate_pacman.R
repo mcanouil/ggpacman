@@ -1,25 +1,23 @@
-#' animate_pacman
+#' Create a Pac-Man Game GIF
 #'
-#' @param pacman something
-#' @param ghosts something
-#' @param file something
-#' @param caption something
-#' @param font_family something
+#' @param pacman A `data.frame` with the coordinates of Pac-Man moves.
+#' @param ghosts A `list`of `data.frame` with the coordinates of (each) Ghost moves.
+#' @param file File name to save GIF on disk.
+#' @param caption A caption to add below the GIF.
+#' @param font_family The font family to use for the caption.
 #'
-#' @return something
+#' @return  Returns a `gif_image` object. See `gganimate::gifski_renderer`.
 #' @export
 animate_pacman <- function(
   pacman,
-  ghosts = list(blinky, pinky, inky, clyde),
+  ghosts,
   file = NULL,
   caption = "&copy; Micka&euml;l '<i style='color:#21908CFF;'>Coeos</i>' Canouil",
   font_family = ""
 ) {
   ## Setup data and variables ----------------------------------------------------------------------
-  segments <- pacman_grid_coord()
-  bonus_points <- bonus_points_coord()
   pacman_moves <- compute_pacman_coord(pacman)
-  bonus_points_eaten <- compute_points_eaten(bonus_points, pacman_moves)
+  bonus_points_eaten <- compute_points_eaten(get(utils::data("maze_points")), pacman_moves)
   map_colours <- c(
     "READY!" = "goldenrod1",
     "wall" = "dodgerblue3", "door" = "dodgerblue3",
@@ -48,7 +46,7 @@ animate_pacman <- function(
     )  +
     ggplot2::coord_fixed(xlim = c(0, 20), ylim = c(0, 26)) +
     ggplot2::geom_segment(
-      data = segments,
+      data = get(utils::data("maze_walls")),
       mapping = ggplot2::aes(
         x = .data[["x"]], y = .data[["y"]],
         xend = .data[["xend"]], yend = .data[["yend"]],
@@ -59,7 +57,7 @@ animate_pacman <- function(
       inherit.aes = FALSE
     ) +
     ggplot2::geom_point(
-      data = bonus_points,
+      data = get(utils::data("maze_points")),
       mapping = ggplot2::aes(
         x = .data[["x"]], y = .data[["y"]],
         size = .data[["type"]],
@@ -135,7 +133,7 @@ animate_pacman <- function(
 
   ## Animate ---------------------------------------------------------------------------------------
   gganimate::animate(
-    plot = base_grid + p_points + p_pacman+ p_ghosts + gganimate::transition_manual(step),
+    plot = base_grid + p_points + p_pacman+ p_ghosts + gganimate::transition_manual(.data[["step"]]),
     width = 3.7 * 2.54,
     height = 4.7 * 2.54,
     units = "cm",

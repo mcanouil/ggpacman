@@ -1,23 +1,9 @@
-make_ghost_coord <- function(data) {
-  eyes_circle <- dplyr::tribble(
-    ~x0, ~y0, ~r, ~part, ~direction,
-    1/5, 1/8, 1/8, "eye", c("up", "down", "right", "left", "middle"),
-    -1/5, 1/8, 1/8, "eye", c("up", "down", "right", "left", "middle"),
-    5/20, 1/8, 1/20, "iris", "right",
-    -3/20, 1/8, 1/20, "iris", "right",
-    1/5, 1/16, 1/20, "iris", "down",
-    -1/5, 1/16, 1/20, "iris", "down",
-    3/20, 1/8, 1/20, "iris", "left",
-    -5/20, 1/8, 1/20, "iris", "left",
-    1/5, 3/16, 1/20, "iris", "up",
-    -1/5, 3/16, 1/20, "iris", "up",
-    1/5, 1/8, 1/20, "iris", "middle",
-    -1/5, 1/8, 1/20, "iris", "middle"
-  ) %>%
-    tidyr::unnest("direction")
-
-  bg <- base_ghost()
-
+#' Compute Ghost Coordinates
+#'
+#' @param data A `data.frame` with the coordinates of Ghost moves.
+#'
+#' @keywords internal
+compute_ghost_coord <- function(data) {
   ghost_out <- data %>%
     tidyr::unnest(c("x", "y")) %>%
     dplyr::mutate(
@@ -46,7 +32,7 @@ make_ghost_coord <- function(data) {
         .l = list(.data[["x"]], .data[["y"]], .data[["noise_x"]], .data[["noise_y"]]),
         .f = function(.x, .y, .noise_x, .noise_y) {
           dplyr::mutate(
-            .data = bg,
+            .data = get(utils::data("ghost_body")),
             x = .data[["x"]] + .x + .noise_x,
             y = .data[["y"]] + .y + .noise_y
           )
@@ -56,7 +42,7 @@ make_ghost_coord <- function(data) {
         .l = list(.data[["x"]], .data[["y"]], .data[["noise_x"]], .data[["noise_y"]], .data[["direction"]]),
         .f = function(.x, .y, .noise_x, .noise_y, .direction) {
           dplyr::mutate(
-            .data = dplyr::filter(eyes_circle, .data[["direction"]] == .direction),
+            .data = dplyr::filter(get(utils::data("ghost_eyes")), .data[["direction"]] == .direction),
             x0 = .data[["x0"]] + .x + .noise_x,
             y0 = .data[["y0"]] + .y + .noise_y,
             direction = NULL
