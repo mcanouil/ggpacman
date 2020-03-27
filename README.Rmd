@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# pacman: A `ggplot2` and `gganimate` Version of Pac-Man
+# A `ggplot2` and `gganimate` Version of Pac-Man
 
 <!-- badges: start -->
 <!-- badges: end -->
