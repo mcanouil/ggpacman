@@ -1,3 +1,12 @@
+#' Compute Ghost Status
+#'
+#' Compute a ghost status, *i.e.*, normal, weak or eaten.
+#'
+#' @param ghost A `data.frame` with the coordinates of Ghost moves.
+#' @param pacman_moves Pac-Man computed moves.
+#' @param bonus_points_eaten Computed datga for points eaten by Pac-Man.
+#'
+#' @keywords internal
 compute_ghost_status <- function(ghost, pacman_moves, bonus_points_eaten) {
   ghosts_vulnerability <- bonus_points_eaten %>%
     dplyr::filter(.data[["type"]] == "big") %>%
@@ -13,7 +22,7 @@ compute_ghost_status <- function(ghost, pacman_moves, bonus_points_eaten) {
     tidyr::unnest("step")
 
   ghost_out <- dplyr::left_join(
-    x = make_ghost_coord(ghost),
+    x = compute_ghost_coord(ghost),
     y = pacman_moves %>%
       dplyr::mutate(ghost_eaten = TRUE) %>%
       dplyr::select(c("X0" = "x", "Y0" = "y", "step", "ghost_eaten")),
@@ -30,10 +39,8 @@ compute_ghost_status <- function(ghost, pacman_moves, bonus_points_eaten) {
   pos_eaten_start <- which(ghost_out[["ghost_eaten"]])
   ghosts_home <- which(ghost_out[["X0"]] == 10 & ghost_out[["Y0"]] == 14)
   for (ipos in pos_eaten_start) {
-    # if (any(ghosts_home>=ipos)) {
-      pos_eaten_end <- min(ghosts_home[ghosts_home>=ipos])
-      ghost_out[["colour"]][ipos:pos_eaten_end] <- paste0(unique(ghost_out[["ghost_name"]]), "_eaten")
-    # }
+    pos_eaten_end <- min(ghosts_home[ghosts_home>=ipos])
+    ghost_out[["colour"]][ipos:pos_eaten_end] <- paste0(unique(ghost_out[["ghost_name"]]), "_eaten")
   }
 
   dplyr::left_join(

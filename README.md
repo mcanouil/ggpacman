@@ -7,13 +7,14 @@
 
 <!-- badges: end -->
 
-The goal of pacman is to …
+The goal of pacman is to …  
+Build a GIF of Pac-Man …
 
 ``` r
-library(pacman)
+library(ggpacman)
 animate_pacman(
-  pacman = pacman(),
-  ghosts = list(blinky(), pinky(), inky(), clyde()),
+  pacman = pacman,
+  ghosts = list(blinky, pinky, inky, clyde),
   font_family = "xkcd"
 )
 ```

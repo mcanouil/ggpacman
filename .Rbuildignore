@@ -3,3 +3,4 @@
 ^README\.Rmd$
 ^R/pacman\.R$
 ^figures$
+^data-raw$
