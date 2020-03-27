@@ -1,5 +1,5 @@
 Package: pacman
-Title: A ggplot2 and gganimate version of Pac-Man
+Title: A `ggplot2` and `gganimate` Version of Pac-Man
 Version: 0.1.0
 Authors@R: 
     person(given = "Mickaël",
