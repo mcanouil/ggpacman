@@ -7,13 +7,13 @@ compute_pacman_coord <- function(data) {
   pacman_state <- dplyr::tribble(
     ~state, ~start, ~end,
     "open_right", 14 / 6 * pi, 4 / 6 * pi,
-    "close_right", 15 / 3 * pi, 3 / 6 * pi,
+    "close_right", 15 / 6 * pi, 3 / 6 * pi,
     "open_up", 11 / 6 * pi, 1 / 6 * pi,
     "close_up", 12 / 3 * pi, 0 / 6 * pi,
     "open_left", 8 / 6 * pi, - 2 / 6 * pi,
-    "close_left", 9 / 3 * pi, - 3 / 6 * pi,
+    "close_left", 9 / 6 * pi, - 3 / 6 * pi,
     "open_down", 5 / 6 * pi, - 5 / 6 * pi,
-    "close_down", 6 / 3 * pi, - 6 / 6 * pi
+    "close_down", pi, - pi
   )
 
   data %>%
