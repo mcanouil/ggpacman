@@ -43,7 +43,7 @@ animate_pacman <- function(
       plot.caption.position = "plot",
       plot.background = ggplot2::element_rect(fill = "black", colour = "black"),
       panel.background = ggplot2::element_rect(fill = "black", colour = "black")
-    )  +
+    ) +
     ggplot2::coord_fixed(xlim = c(0, 20), ylim = c(0, 26)) +
     ggplot2::geom_segment(
       data = get(utils::data("maze_walls")),
