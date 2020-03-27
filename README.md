@@ -8,3 +8,14 @@
 <!-- badges: end -->
 
 The goal of pacman is to …
+
+``` r
+library(pacman)
+animate_pacman(
+  pacman = pacman(),
+  ghosts = list(blinky(), pinky(), inky(), clyde()),
+  font_family = "xkcd"
+)
+```
+
+![](man/figures/README-pacman-1.gif)<!-- -->
