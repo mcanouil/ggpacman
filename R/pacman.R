@@ -549,7 +549,7 @@ p_ghosts <- map(.x = list(blinky, pinky, inky, clyde), .f = function(data) {
   )
 })
 
-# base_grid +
+# base_grid + p_pacman +
 #   theme_light() + theme(panel.grid.minor = element_blank(), legend.position = "none") +
 #   scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
 #   scale_y_continuous(breaks = 0:26, sec.axis = dup_axis())
@@ -565,7 +565,6 @@ animate(
   units = "cm",
   res = 120,
   bg = "black",
-  duration = 20,
-  # fps = 24,
+  duration = 10,
   renderer = gifski_renderer(file = here("figures", "pacman.gif"))
 )
