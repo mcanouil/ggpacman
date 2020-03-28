@@ -12,4 +12,3 @@ compute_pacman_coord(data)
 \description{
 Compute Pac-Man Coordinates
 }
-\keyword{internal}

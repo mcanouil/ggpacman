@@ -3,7 +3,7 @@
 #' @param bonus_points Bonus points coordinates.
 #' @param pacman_moves Pac-Man computed moves.
 #'
-#' @keywords internal
+#' @export
 compute_points_eaten <- function(bonus_points, pacman_moves) {
   dplyr::right_join(bonus_points, pacman_moves, by = c("x", "y")) %>%
     dplyr::distinct(.data[["step"]], .data[["x"]], .data[["y"]], .data[["type"]]) %>%
