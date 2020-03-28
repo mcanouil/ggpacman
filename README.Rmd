@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 [![R build status](https://github.com/mcanouil/ggpacman/workflows/R-CMD-check/badge.svg)](https://github.com/mcanouil/ggpacman/actions)
 <!-- badges: end -->
 
-The goal of pacman is to ...  
+The goal of `ggpacman` is to ...  
 Build a GIF of the game Pac-Man (*not to develop R version of Pac-Man*) ...
 
 ## Installation
@@ -42,7 +42,7 @@ remotes::install_github("mcanouil/ggpacman")
 
 ## Pac-Man in action
 
-```{r pacman, eval = FALSE}
+```{r pacman}
 library(ggpacman)
 animate_pacman(
   pacman = pacman,
@@ -68,7 +68,7 @@ But, I am going to go through my code here (you might be interested to actually 
 
 ### The packages
 
-```{r, results = "hide", message = FALSE, warning = FALSE}
+```{r libraries, results = "hide", message = FALSE, warning = FALSE}
 library("stats")
 library("utils")
 library("rlang")
@@ -89,7 +89,7 @@ library("ggtext")
 First thing first, I needed to set-up the base layer, meaning, the maze from Pac-Man.  
 I did start by setting the coordinates of the maze.
 
-```{r}
+```{r base-layer}
 base_layer <- ggplot() +
   theme_void() +
   theme(
@@ -103,7 +103,7 @@ base_layer <- ggplot() +
 For later use, let's add some scales (actually those scales, where defined way after chronologically speaking).
 I am using those to define size and colours for all the `geom_*()` I am going to use to achieve the Pac-Man GIF.
 
-```{r}
+```{r colours-mapping}
 map_colours <- c(
   "READY!" = "goldenrod1",
   "wall" = "dodgerblue3", "door" = "dodgerblue3",
@@ -116,17 +116,19 @@ map_colours <- c(
   "Clyde" = "orange", "Clyde_weak" = "blue", "Clyde_eaten" = "transparent"
 )
 ```
-```{r}
+
+```{r base-layer-colours}
 base_layer <- base_layer +
   scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5, "eaten" = 3)) +
   scale_fill_manual(breaks = names(map_colours), values = map_colours) +
   scale_colour_manual(breaks = names(map_colours), values = map_colours) 
+base_layer
 ```
 
 My `base_layer` here is not really helpful, so I temporarily added some elements to help me draw everything.  
 *Note*: I won't use it in the following.
 
-```{r}
+```{r base-layer-dev}
 base_layer +
   scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
   scale_y_continuous(breaks = 0:26, sec.axis = dup_axis()) +
@@ -143,7 +145,7 @@ Quite better, isn't it?!
 
 I started drawing the vertical lines on the left (as you may have noticed, the first level is symmetrical).
 
-```{r}
+```{r left-vertical}
 left_vertical_segments <- tribble(
   ~x, ~y, ~xend, ~yend,
   0, 0, 0, 9,
@@ -167,7 +169,8 @@ left_vertical_segments <- tribble(
   8, 22, 8, 24
 )
 ```
-```{r}
+
+```{r left-vertical-plot}
 base_layer + 
   geom_segment(
     data = left_vertical_segments,
@@ -180,7 +183,7 @@ base_layer +
 
 Let's add the horizontal lines (still on the left side of the maze)!
 
-```{r}
+```{r left-horizontal}
 left_horizontal_segments <- tribble(
   ~x, ~y, ~xend, ~yend,
   0, 0, 10, 0,
@@ -213,7 +216,8 @@ left_horizontal_segments <- tribble(
 
 left_segments <- bind_rows(left_vertical_segments, left_horizontal_segments)
 ```
-```{r}
+
+```{r left-plot}
 base_layer + 
   geom_segment(
     data = left_segments,
@@ -227,14 +231,15 @@ base_layer +
 Now, we can see the maze.
 As I said earlier, the first level is symmetrical, let's use `left_segments` to compute a `right_segments`.
 
-```{r}
+```{r right}
 right_segments <-  mutate(
   .data = left_segments,
   x = abs(x - 20),
   xend = abs(xend - 20)
 )
 ```
-```{r}
+
+```{r right-plot}
 base_layer + 
   geom_segment(
     data = bind_rows(left_segments, right_segments),
@@ -247,7 +252,7 @@ base_layer +
 
 Now, let's add the missing vertical lines in the middle and the ghost "house" door.
 
-```{r}
+```{r middle}
 centre_vertical_segments <- tribble(
   ~x, ~y, ~xend, ~yend,
   10, 2, 10, 4,
@@ -260,7 +265,7 @@ door_segment <- tibble(x = 9, y = 15, xend = 11, yend = 15, type = "door")
 
 Combine all the segments and draw them all.
 
-```{r}
+```{r maze}
 maze_walls <- bind_rows(
   left_segments,
   centre_vertical_segments,
@@ -269,7 +274,8 @@ maze_walls <- bind_rows(
   mutate(type = "wall") %>%
   bind_rows(door_segment)
 ```
-```{r}
+
+```{r maze-plot}
 base_layer + 
   geom_segment(
     data = maze_walls,
@@ -285,7 +291,7 @@ You may have noticed, I added a column `type`, which can hold two values: `wall`
 I am going to use that as an aesthetic, you may already have guessed which ones.  
 The answer is the `colour` and `size` aesthetics.
 
-```{r}
+```{r maze-plot-colour}
 base_layer + 
   geom_segment(
     data = maze_walls,
@@ -305,7 +311,7 @@ The strategy was quite the same as for the grid layer:
 * Compute the coordinates for the right side.
 * Use a column `type` for the two types of bonus points, *i.e.*, `"normal"` and `"big"` (the one who weaken the ghosts).
 
-```{r}
+```{r bonus-points}
 bonus_points_coord <- function() {
   left_bonus_points <- tribble(
     ~x, ~y, ~type,
@@ -333,7 +339,8 @@ bonus_points_coord <- function() {
 }
 maze_points <- bonus_points_coord()
 ```
-```{r}
+
+```{r maze-point-plot}
 maze_layer <- base_layer + 
   geom_segment(
     data = maze_walls,
@@ -354,14 +361,14 @@ maze_layer
 ### Pac-Man character
 
 Time to draw the main character.
-To drax Pac-Man, I needed few things first:
+To draw Pac-Man, I needed few things first:
 
 * Pac-Man moves, *i.e.*, all the coordinates where Pac-Man is supposed to be at every step.
-    ```{r}
+    ```{r pacman-position}
     data("pacman", package = "ggpacman")
     unnest(pacman, c("x", "y"))
     ```
-    ```{r}
+    ```{r pacman-position-plot}
     maze_layer +
       geom_point(
         data = unnest(pacman, c("x", "y")), 
@@ -372,7 +379,7 @@ To drax Pac-Man, I needed few things first:
     
 * Pac-Man shape (open and closed mouth). Since, Pac-Man is not a complete circle shape, I used `geom_arc_bar()`, and defined the properties of each state of Pac-Man based on the aesthetics required by it.
     *Note*: At first, I wanted a smooth animation/transition of Pac-Man opening and closing its mouth, this is why there are four `"close_"` states.
-    ```{r}
+    ```{r pacman-state}
     pacman_state <- tribble(
       ~state, ~start, ~end,
       "open_right", 14 / 6 * pi, 4 / 6 * pi,
@@ -385,7 +392,7 @@ To drax Pac-Man, I needed few things first:
       "close_down", pi, - pi
     )
     ```
-    ```{r}
+    ```{r pacman-state-plot}
     ggplot() +
       geom_arc_bar(
         data = pacman_state,
@@ -400,12 +407,12 @@ To drax Pac-Man, I needed few things first:
       facet_wrap(vars(state), ncol = 4)
     ```
 
-<!-- <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Next mission, should you choose to accept, is to make Pac-Man face the direction of movement🎖</p>&mdash; Thomas Lin Pedersen (@thomasp85) <a href="https://twitter.com/thomasp85/status/1241767912370774020?ref_src=twsrc%5Etfw">March 22, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Next mission, should you choose to accept, is to make Pac-Man face the direction of movement🎖</p>&mdash; Thomas Lin Pedersen (@thomasp85) <a href="https://twitter.com/thomasp85/status/1241767912370774020?ref_src=twsrc%5Etfw">March 22, 2020</a></blockquote> <!-- <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
 
 Once those things available, how to make Pac-Man looks where he is headed?  
 Short answer, I just computed the differences between two successive positions of Pac-Man and added both open/close state to a new column `state`.
 
-```{r}
+```{r pacman-position-state}
 pacman %>%
   unnest(c("x", "y")) %>%
   mutate(
@@ -425,42 +432,12 @@ pacman %>%
 
 Here, in preparation for [`gganimate`](https://gganimate.com/), I also added a column `step` before merging the new upgraded `pacman` with the Pac-Man `state` column with the `pacman_state` defined earlier.
 
-```{r}
-compute_pacman_coord <- function(data) {
-  pacman_state <- tribble(
-    ~state, ~start, ~end,
-    "open_right", 14 / 6 * pi, 4 / 6 * pi,
-    "close_right", 15 / 6 * pi, 3 / 6 * pi,
-    "open_up", 11 / 6 * pi, 1 / 6 * pi,
-    "close_up", 12 / 3 * pi, 0 / 6 * pi,
-    "open_left", 8 / 6 * pi, - 2 / 6 * pi,
-    "close_left", 9 / 6 * pi, - 3 / 6 * pi,
-    "open_down", 5 / 6 * pi, - 5 / 6 * pi,
-    "close_down", pi, - pi
-  )
-
-  data  %>%
-    unnest(c("x", "y")) %>%
-    mutate(
-      state_x = sign(x - lag(x)),
-      state_y = sign(y - lag(y)),
-      state = case_when(
-        (is.na(state_x) | state_x %in% 0) &
-          (is.na(state_y) | state_y %in% 0) ~ list(c("open_right", "close_right")),
-        state_x == 1 & state_y == 0 ~ list(c("open_right", "close_right")),
-        state_x == -1 & state_y == 0 ~ list(c("open_left", "close_left")),
-        state_x == 0 & state_y == -1 ~ list(c("open_down", "close_down")),
-        state_x == 0 & state_y == 1 ~ list(c("open_up", "close_up"))
-      )
-    )  %>%
-    unnest("state") %>%
-    mutate(step = 1:n()) %>%
-    left_join(y = pacman_state, by = "state")
-}
-pacman_moves <- compute_pacman_coord(pacman)
+```{r pacman-moves}
+pacman_moves <- ggpacman::compute_pacman_coord(pacman)
 pacman_moves
 ```
-```{r}
+
+```{r pacman-moves-plots}
 maze_layer +
   geom_arc_bar(
     data = pacman_moves,
@@ -479,7 +456,7 @@ We can't see much, right?
 Ok, perhaps it's time to use [`gganimate`](https://gganimate.com/).  
 I am going to animate Pac-Man based on the column `step`, which is, if you looked at the code above, just the line number of `pacman_moves`.
 
-```{r}
+```{r pacman-animated}
 animated_pacman <- maze_layer +
   geom_arc_bar(
     data = pacman_moves,
@@ -494,7 +471,8 @@ animated_pacman <- maze_layer +
   ) + 
   transition_manual(step)
 ```
-```{r, echo = FALSE}
+
+```{r pacman-plot-animated, echo = FALSE}
 animate(
   plot = animated_pacman,
   width = 3.7 * 2.54,
@@ -509,11 +487,11 @@ animate(
 
 *Note: `pacman` is a dataset of `ggpacman` (`data("pacman", package = "ggpacman")`).*
 
-### The Ghosts character (Blinky, Pinky, Inky and Clyde)
+### The Ghosts characters (Blinky, Pinky, Inky and Clyde)
 
 #### Body
 
-```{r}
+```{r ghost-arc}
 ghost_arc <- unnest(tribble(
   ~x0, ~y0, ~r, ~start, ~end, ~part,
   0, 0, 0.5, - 1 * pi / 2, 1 * pi / 2, "top",
@@ -522,7 +500,9 @@ ghost_arc <- unnest(tribble(
   0.5, -0.5 + 1/8, 0.125, - 2 * pi / 4, - 4 * pi / 4, "bottom",
   c(-1 / 3, 0, 1 / 3), -0.5 + 1/8, 1 / 24, - 1 * pi / 2, 1 * pi / 2, "bottom",
 ), "x0")
+```
 
+```{r ghost-top}
 top <- ggplot() +
   geom_arc_bar(
     data = ghost_arc[1, ],
@@ -530,43 +510,45 @@ top <- ggplot() +
   ) +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1))
 ```
-```{r}
+
+```{r ghost-top-plot, echo = FALSE}
 top
 ```
 
-```{r}
+```{r ghost-top-polygon}
 top_polygon <- ggplot_build(top)$data[[1]][, c("x", "y")]
 ```
 
-```{r}
+```{r ghost-bottom}
 bottom <- ggplot() +
   geom_arc_bar(
     data = ghost_arc[c(5, 3, 2, 4), ],
     mapping = aes(
-      x0 = .data[["x0"]], y0 = .data[["y0"]],
+      x0 = x0, y0 = y0,
       r0 = 0, r = 0.17,
-      start = .data[["start"]], end = .data[["end"]]
+      start = start, end = end
     )
   ) +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1))
 ```
-```{r}
+```{r ghost-bottom-plot, echo = FALSE}
 bottom
 ```
 
-```{r}
+```{r ghost-bottom-polygon}
 bottom_polygon <- ggplot_build(bottom)$data[[1]][, c("x", "y")]
 ```
 
 
-```{r}
+```{r ghost-body}
 ghost_body <- bind_rows(
   top_polygon[-nrow(top_polygon), ],
   tibble(x = 0.5, y = -0.5 + 1/8),
   bottom_polygon
 )
 ```
-```{r}
+
+```{r ghost-body-plot}
 ggplot() +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
   geom_polygon(
@@ -580,7 +562,7 @@ ggplot() +
 
 #### Eyes
 
-```{r}
+```{r ghost-eyes}
 ghost_eyes <- tribble(
   ~x0, ~y0, ~r, ~part, ~direction,
   1/5, 1/8, 1/8, "eye", c("up", "down", "right", "left", "middle"),
@@ -598,12 +580,13 @@ ghost_eyes <- tribble(
 ) %>%
   unnest("direction")
 ```
-```{r}
-map_colours <- c("eye" = "white", "iris" = "black")
+
+```{r ghost-eyes-plot}
+map_eyes <- c("eye" = "white", "iris" = "black")
 ggplot() +
   coord_fixed(xlim = c(-0.5, 0.5), ylim = c(-0.5, 0.5)) +
-  scale_fill_manual(breaks = names(map_colours), values = map_colours) +
-  scale_colour_manual(breaks = names(map_colours), values = map_colours) +
+  scale_fill_manual(breaks = names(map_eyes), values = map_eyes) +
+  scale_colour_manual(breaks = names(map_eyes), values = map_eyes) +
   geom_circle(
     data = ghost_eyes,
     mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part),
@@ -617,8 +600,7 @@ ggplot() +
 
 #### Ghost shape
 
-```{r}
-map_colours <- c("eye" = "white", "iris" = "black")
+```{r ghost-shape-plot}
 ggplot() +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
   scale_fill_manual(breaks = names(map_colours), values = map_colours) +
@@ -637,6 +619,366 @@ ggplot() +
   facet_wrap(vars(direction), ncol = 3)
 ```
 
+```{r blinky-ghost}
+blinky_ghost <- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = "Blinky") %>%
+  unnest(c("x", "y")) %>%
+  mutate(
+    X0 = x,
+    Y0 = y,
+    state_x = sign(round(x) - lag(round(x))),
+    state_y = sign(round(y) - lag(round(y))),
+    direction = case_when(
+      (is.na(state_x) | state_x %in% 0) &
+        (is.na(state_y) | state_y %in% 0) ~ "middle",
+      state_x == 1 & state_y == 0 ~ "right",
+      state_x == -1 & state_y == 0 ~ "left",
+      state_x == 0 & state_y == -1 ~ "down",
+      state_x == 0 & state_y == 1 ~ "up"
+    )
+  ) %>%
+  unnest("direction") %>%
+  mutate(state = list(1:4)) %>%
+  unnest("state")
+blinky_ghost
+```
+
+```{r blinky-ghost-plot}
+blinky_ghost <- blinky_ghost %>% 
+  mutate(
+    step = 1:n(),
+    noise_x = rnorm(n(), mean = 0, sd = 0.05),
+    noise_y = rnorm(n(), mean = 0, sd = 0.05)
+  )
+blinky_ghost
+```
+
+```{r blinky-ghost-state}
+blinky_ghost <- blinky_ghost %>% 
+  mutate(
+    body = pmap(
+      .l = list(x, y, noise_x, noise_y),
+      .f = function(.x, .y, .noise_x, .noise_y) {
+        mutate(
+          .data = get(data("ghost_body")),
+          x = x + .x + .noise_x,
+          y = y + .y + .noise_y
+        )
+      }
+    ),
+    eyes = pmap(
+      .l = list(x, y, noise_x, noise_y, direction),
+      .f = function(.x, .y, .noise_x, .noise_y, .direction) {
+        mutate(
+          .data = filter(get(data("ghost_eyes")), direction == .direction),
+          x0 = x0 + .x + .noise_x,
+          y0 = y0 + .y + .noise_y,
+          direction = NULL
+        )
+      }
+    ),
+    x = NULL,
+    y = NULL
+  )
+blinky_ghost
+```
+
+```{r blinky-moves}
+blinky_ghost <- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = "Blinky")
+blinky_moves <- ggpacman::compute_ghost_coord(blinky_ghost)
+```
+
+```{r blinky-plot}
+blinky_plot <- base_layer +
+  coord_fixed(xlim = c(-1, 2), ylim = c(-1, 2)) +
+  geom_polygon(
+    data = unnest(blinky_moves, "body"),
+    mapping = aes(x = x, y = y, fill = colour, colour = colour, group = step),
+    inherit.aes = FALSE
+  ) +
+  geom_circle(
+    data = unnest(blinky_moves, "eyes"),
+    mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part, group = step),
+    inherit.aes = FALSE
+  )
+```
+
+```{r blinky-animated}
+animated_blinky <- blinky_plot + transition_manual(step)
+```
+
+```{r blinky-plot-animated, echo = FALSE}
+animate(
+  plot = animated_blinky,
+  width = 3.7 * 2.54,
+  height = 3.7 * 2.54,
+  units = "cm",
+  res = 120,
+  bg = "black",
+  duration = 10,
+  renderer = gifski_renderer()
+)
+```
+
+### How Pac-Man interacts with the maze?
+
+#### Bonus points
+
+```{r points-eaten}
+pacman_moves <- ggpacman::compute_pacman_coord(get(data("pacman", package = "ggpacman")))
+right_join(get(data("maze_points")), pacman_moves, by = c("x", "y")) %>%
+  distinct(step, x, y, type) %>%
+  mutate(
+    step = map2(step, max(step), ~ seq(.x, .y, 1)),
+    colour = "eaten"
+  ) %>%
+  unnest("step")
+```
+
+```{r points-eaten-plot}
+pacman_moves <- ggpacman::compute_pacman_coord(get(data("pacman", package = "ggpacman")))
+bonus_points_eaten <- ggpacman::compute_points_eaten(get(data("maze_points")), pacman_moves)
+maze_layer_points <- maze_layer +
+  geom_point(
+    data = bonus_points_eaten,
+    mapping = aes(x = x, y = y, colour = colour, size = colour, group = step),
+    inherit.aes = FALSE
+  )
+maze_layer_points
+```
+
+```{r points-eaten-animated}
+animated_points <- maze_layer_points + transition_manual(step)
+```
+
+```{r points-eaten-plot-animated, echo = FALSE}
+animate(
+  plot = animated_points,
+  width = 3.7 * 2.54,
+  height = 4.7 * 2.54,
+  units = "cm",
+  res = 120,
+  bg = "black",
+  duration = 10,
+  renderer = gifski_renderer()
+)
+```
+
+
+#### Ghost "weak" and "eaten" status
+
+```{r}
+ghosts_vulnerability <- bonus_points_eaten %>%
+  filter(type == "big") %>%
+  group_by(x, y) %>%
+  summarise(step_init = min(step)) %>%
+  ungroup() %>%
+  mutate(
+    step = map(step_init, ~ seq(.x, .x + 30, 1)),
+    vulnerability = TRUE,
+    x = NULL,
+    y = NULL
+  ) %>%
+  unnest("step")
+ghosts_vulnerability
+```
+
+```{r}
+ggpacman::compute_ghost_status
+```
+
+```{r}
+ghost_moves <- ggpacman::compute_ghost_status(
+  ghost = get(data("blinky", package = "ggpacman")),
+  pacman_moves = pacman_moves,
+  bonus_points_eaten = bonus_points_eaten
+)
+ghost_moves %>% 
+  filter(state == 1) %>% 
+  distinct(step, direction, colour, vulnerability) %>% 
+  as.data.frame()
+```
+
+```{r blinky-moves-state}
+blinky_ghost <- bind_rows(
+  tibble(x = 1:4, y = 0, colour = "Blinky"),
+  tibble(x = 5:8, y = 0, colour = "Blinky_weak"),
+  tibble(x = 9:12, y = 0, colour = "Blinky_eaten")
+)
+blinky_moves <- ggpacman::compute_ghost_coord(blinky_ghost)
+```
+
+```{r blinky-plot-state}
+blinky_plot <- base_layer +
+  coord_fixed(xlim = c(0, 13), ylim = c(-1, 1)) +
+  geom_polygon(
+    data = unnest(blinky_moves, "body"),
+    mapping = aes(x = x, y = y, fill = colour, colour = colour, group = step),
+    inherit.aes = FALSE
+  ) +
+  geom_circle(
+    data = unnest(blinky_moves, "eyes"),
+    mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part, group = step),
+    inherit.aes = FALSE
+  )
+```
+
+```{r blinky-astate-nimated}
+animated_blinky <- blinky_plot + transition_manual(step)
+```
+
+```{r blinky-state-plot-animated, echo = FALSE}
+animate(
+  plot = animated_blinky,
+  width = 3.7 * 2.54,
+  height = 0.5 * 2.54,
+  units = "cm",
+  res = 120,
+  bg = "black",
+  duration = 10,
+  renderer = gifski_renderer()
+)
+```
+
+## Plot time
+
+```{r plot-time-data}
+data("pacman", package = "ggpacman")
+data("maze_points", package = "ggpacman")
+data("maze_walls", package = "ggpacman")
+data("blinky", package = "ggpacman")
+data("pinky", package = "ggpacman")
+data("inky", package = "ggpacman")
+data("clyde", package = "ggpacman")
+ghosts <- list(blinky, pinky, inky, clyde)
+pacman_moves <- ggpacman::compute_pacman_coord(pacman)
+bonus_points_eaten <- ggpacman::compute_points_eaten(maze_points, pacman_moves)
+map_colours <- c(
+  "READY!" = "goldenrod1",
+  "wall" = "dodgerblue3", "door" = "dodgerblue3",
+  "normal" = "goldenrod1", "big" = "goldenrod1", "eaten" = "black",
+  "Pac-Man" = "yellow",
+  "eye" = "white", "iris" = "black",
+  "Blinky" = "red", "Blinky_weak" = "blue", "Blinky_eaten" = "transparent",
+  "Pinky" = "pink", "Pinky_weak" = "blue", "Pinky_eaten" = "transparent",
+  "Inky" = "cyan", "Inky_weak" = "blue", "Inky_eaten" = "transparent",
+  "Clyde" = "orange", "Clyde_weak" = "blue", "Clyde_eaten" = "transparent"
+)
+```
+
+```{r plot-time-base}
+base_grid <- ggplot() + 
+  theme_void() +
+  theme(
+    legend.position = "none",
+    plot.caption = element_textbox_simple(halign = 0.5, colour = "white"),
+    plot.caption.position = "plot",
+    plot.background = element_rect(fill = "black", colour = "black"),
+    panel.background = element_rect(fill = "black", colour = "black")
+  ) +
+  labs(caption = "&copy; Micka&euml;l '<i style='color:#21908CFF;'>Coeos</i>' Canouil") +
+  scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5, "eaten" = 3)) +
+  scale_fill_manual(breaks = names(map_colours), values = map_colours) +
+  scale_colour_manual(breaks = names(map_colours), values = map_colours) +
+  coord_fixed(xlim = c(0, 20), ylim = c(0, 26)) +
+  geom_segment(
+    data = maze_walls,
+    mapping = aes(x = x, y = y, xend = xend, yend = yend, size = type, colour = type),
+    lineend = "round",
+    inherit.aes = FALSE
+  ) +
+  geom_point(
+    data = maze_points,
+    mapping = aes(x = x, y = y, size = type, colour = type),
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = tibble(x = 10, y = 11, label = "READY!", step = 1:20),
+    mapping = aes(x = x, y = y, label = label, colour = label, group = step),
+    size = 6
+  )
+base_grid
+```
+
+```{r plot-time-points}
+p_points <- list(
+  geom_point(
+    data = bonus_points_eaten,
+    mapping = aes(x = x, y = y, colour = colour, size = colour, group = step),
+    inherit.aes = FALSE
+  )
+)
+base_grid + p_points
+```
+
+```{r plot-time-pacman}
+p_pacman <- list(
+  geom_arc_bar(
+    data = pacman_moves,
+    mapping = aes(
+      x0 = x, y0 = y,
+      r0 = 0, r = 0.5,
+      start = start, end = end,
+      colour = colour, fill = colour,
+      group = step
+    ),
+    inherit.aes = FALSE
+  )
+)
+base_grid + p_pacman
+```
+
+```{r plot-time-ghosts}
+p_ghosts <- map(.x = ghosts, .f = function(data) {
+  ghost_moves <- compute_ghost_status(
+    ghost = data,
+    pacman_moves = pacman_moves,
+    bonus_points_eaten = bonus_points_eaten
+  )
+  list(
+    geom_polygon(
+      data = unnest(ghost_moves, "body"),
+      mapping = aes(
+        x = x, y = y,
+        fill = colour, colour = colour,
+        group = step
+      ),
+      inherit.aes = FALSE
+    ),
+    geom_circle(
+      data = unnest(ghost_moves, "eyes"),
+      mapping = aes(
+        x0 = x0, y0 = y0,
+        r = r,
+        colour = part, fill = part,
+        group = step
+      ),
+      inherit.aes = FALSE
+    )
+  )
+})
+base_grid + p_ghosts
+```
+
+```{r plot-time-all}
+base_grid + p_points + p_pacman + p_ghosts
+```
+
+```{r plot-time-all-transition}
+PacMan <- base_grid + p_points + p_pacman + p_ghosts + transition_manual(step)
+```
+
+```{r plot-time-all-animated, echo = FALSE}
+animate(
+  plot = PacMan,
+  width = 3.7 * 2.54,
+  height = 4.7 * 2.54,
+  units = "cm",
+  res = 120,
+  bg = "black",
+  duration = 10,
+  renderer = gifski_renderer()
+)
+```
 
 
 ## Getting help

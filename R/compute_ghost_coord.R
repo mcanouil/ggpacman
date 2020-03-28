@@ -2,9 +2,9 @@
 #'
 #' @param data A `data.frame` with the coordinates of Ghost moves.
 #'
-#' @keywords internal
+#' @export
 compute_ghost_coord <- function(data) {
-  ghost_out <- data %>%
+  data %>%
     tidyr::unnest(c("x", "y")) %>%
     dplyr::mutate(
       X0 = .data[["x"]],
@@ -23,7 +23,6 @@ compute_ghost_coord <- function(data) {
     tidyr::unnest("direction") %>%
     dplyr::mutate(state = list(1:4)) %>%
     tidyr::unnest("state") %>%
-    dplyr::group_by(.data[["colour"]]) %>%
     dplyr::mutate(
       step = 1:dplyr::n(),
       noise_x = stats::rnorm(dplyr::n(), mean = 0, sd = 0.05),
@@ -51,8 +50,5 @@ compute_ghost_coord <- function(data) {
       ),
       x = NULL,
       y = NULL
-    ) %>%
-    dplyr::ungroup()
-
-  ghost_out
+    )
 }

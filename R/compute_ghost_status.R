@@ -6,7 +6,7 @@
 #' @param pacman_moves Pac-Man computed moves.
 #' @param bonus_points_eaten Computed datga for points eaten by Pac-Man.
 #'
-#' @keywords internal
+#' @export
 compute_ghost_status <- function(ghost, pacman_moves, bonus_points_eaten) {
   ghosts_vulnerability <- bonus_points_eaten %>%
     dplyr::filter(.data[["type"]] == "big") %>%

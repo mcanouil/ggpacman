@@ -33,17 +33,17 @@ animate_pacman <- function(
   ## Plot time -------------------------------------------------------------------------------------
   base_grid <- ggplot2::ggplot() +
     ggplot2::theme_void(base_family = font_family) +
-    ggplot2::theme(legend.position = "none") +
-    ggplot2::labs(caption = caption) +
-    ggplot2::scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5, "eaten" = 3)) +
-    ggplot2::scale_fill_manual(breaks = names(map_colours), values = map_colours) +
-    ggplot2::scale_colour_manual(breaks = names(map_colours), values = map_colours) +
     ggplot2::theme(
+      legend.position = "none",
       plot.caption = ggtext::element_textbox_simple(halign = 0.5, colour = "white"),
       plot.caption.position = "plot",
       plot.background = ggplot2::element_rect(fill = "black", colour = "black"),
       panel.background = ggplot2::element_rect(fill = "black", colour = "black")
     ) +
+    ggplot2::labs(caption = caption) +
+    ggplot2::scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5, "eaten" = 3)) +
+    ggplot2::scale_fill_manual(breaks = names(map_colours), values = map_colours) +
+    ggplot2::scale_colour_manual(breaks = names(map_colours), values = map_colours) +
     ggplot2::coord_fixed(xlim = c(0, 20), ylim = c(0, 26)) +
     ggplot2::geom_segment(
       data = get(utils::data("maze_walls")),
@@ -133,7 +133,7 @@ animate_pacman <- function(
 
   ## Animate ---------------------------------------------------------------------------------------
   gganimate::animate(
-    plot = base_grid + p_points + p_pacman+ p_ghosts + gganimate::transition_manual(.data[["step"]]),
+    plot = base_grid + p_points + p_pacman + p_ghosts + gganimate::transition_manual(.data[["step"]]),
     width = 3.7 * 2.54,
     height = 4.7 * 2.54,
     units = "cm",
