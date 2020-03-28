@@ -12,4 +12,3 @@ compute_ghost_coord(data)
 \description{
 Compute Ghost Coordinates
 }
-\keyword{internal}

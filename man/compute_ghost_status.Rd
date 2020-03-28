@@ -16,4 +16,3 @@ compute_ghost_status(ghost, pacman_moves, bonus_points_eaten)
 \description{
 Compute a ghost status, \emph{i.e.}, normal, weak or eaten.
 }
-\keyword{internal}

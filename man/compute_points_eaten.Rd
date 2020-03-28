@@ -14,4 +14,3 @@ compute_points_eaten(bonus_points, pacman_moves)
 \description{
 Compute Point Eaten by Pac-Man
 }
-\keyword{internal}

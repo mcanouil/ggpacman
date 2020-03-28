@@ -2,7 +2,7 @@
 #'
 #' @param data A `data.frame` with the coordinates of Pac-Man moves.
 #'
-#' @keywords internal
+#' @export
 compute_pacman_coord <- function(data) {
   pacman_state <- dplyr::tribble(
     ~state, ~start, ~end,
