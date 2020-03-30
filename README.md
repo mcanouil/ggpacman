@@ -91,22 +91,24 @@ and
 
 </blockquote>
 
-1.  [The packages](#a-top)
-2.  [The maze layer](#b-top)
-    1.  [The base layer](#b1-top)
-    2.  [The grid layer](#b2-top)
-    3.  [The bonus points layer](#b3-top)
-3.  [Pac-Man character](#c-top)
-4.  [The Ghosts characters (Blinky, Pinky, Inky and Clyde)](#d-top)
-    1.  [Body](#d1-top)
-    2.  [Eyes](#d2-top)
-    3.  [Ghost shape](#d3-top)
-5.  [How Pac-Man interacts with the maze?](#e-top)
-    1.  [Bonus points](#e1-top)
-    2.  [Ghost `"weak"` and `"eaten"` states](#e2-top)
-6.  [Plot time](#f-top)
+1.  [The packages](#the-packages)
+2.  [The maze layer](#the-maze-layer)
+    1.  [The base layer](#the-base-layer)
+    2.  [The grid layer](#the-grid-layer)
+    3.  [The bonus points layer](#the-bonus-points-layer)
+3.  [Pac-Man character](#pac-man-character)
+4.  [The Ghosts characters](#the-ghosts-characters)
+    1.  [Body](#body)
+    2.  [Eyes](#eyes)
+    3.  [Ghost shape](#ghost-shape)
+5.  [How Pac-Man interacts with the
+    maze?](#how-pac-man-interacts-with-the-maze)
+    1.  [Bonus points](#bonus-points)
+    2.  [Ghost `"weak"` and `"eaten"`
+        states](#ghost-weak-and-eaten-states-top)
+6.  [Plot time](#plot-time)
 
-### The packages ([top](#a-top))
+### The packages
 
 ``` r
 library("stats")
@@ -122,9 +124,9 @@ library("gganimate")
 library("ggtext")
 ```
 
-### The maze layer ([top](#b-top))
+### The maze layer
 
-#### The base layer ([top](#b1-top))
+#### The base layer
 
 First thing first, I needed to set-up the base layer, meaning, the maze
 from Pac-Man.  
@@ -167,7 +169,7 @@ base_layer <- base_layer +
   scale_colour_manual(breaks = names(map_colours), values = map_colours) 
 ```
 
-![](man/figures/README-unnamed-chunk-2-1.png)<!-- -->
+![](man/figures/README-base-layer-plot-1.png)<!-- -->
 
 My `base_layer` here is not really helpful, so I temporarily added some
 elements to help me draw everything on it.  
@@ -188,7 +190,7 @@ base_layer +
 
 Quite better, isn’t it?\!
 
-#### The grid layer ([top](#b2-top))
+#### The grid layer
 
 Here, I am calling “grid”, the walls of the maze.  
 For this grid, I started drawing the vertical lines on the left side of
@@ -372,7 +374,7 @@ base_layer +
 *Note: `maze_walls` is a dataset of `ggpacman` (`data("maze_walls",
 package = "ggpacman")`).*
 
-#### The bonus points layer ([top](#b3-top))
+#### The bonus points layer
 
 The strategy was quite the same as for the grid layer:
 
@@ -427,12 +429,12 @@ maze_layer <- base_layer +
   )
 ```
 
-![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
+![](man/figures/README-maze-layer-show-1.png)<!-- -->
 
 *Note: `maze_points` is a dataset of `ggpacman` (`data("maze_points",
 package = "ggpacman")`).*
 
-### Pac-Man character ([top](#c-top))
+### Pac-Man character
 
 It is now time to draw the main character. To draw Pac-Man, I needed few
 things:
@@ -612,7 +614,7 @@ animated_pacman <- maze_layer +
 *Note: `pacman` is a dataset of `ggpacman` (`data("pacman", package =
 "ggpacman")`).*
 
-### The Ghosts characters (Blinky, Pinky, Inky and Clyde) ([top](#d-top))
+### The Ghosts characters
 
 Time to draw the ghosts, namely: Blinky, Pinky, Inky and Clyde.
 
@@ -823,26 +825,26 @@ blinky_ghost <- blinky_ghost %>%
     #> # A tibble: 20 x 12
     #>        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x
     #>    <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>
-    #>  1     0     0 Blinky     0     0      NA      NA middle        1     1  0.00450
-    #>  2     0     0 Blinky     0     0      NA      NA middle        2     2  0.0857 
-    #>  3     0     0 Blinky     0     0      NA      NA middle        3     3  0.0992 
-    #>  4     0     0 Blinky     0     0      NA      NA middle        4     4  0.0455 
-    #>  5     1     0 Blinky     1     0       1       0 right         1     5  0.00421
-    #>  6     1     0 Blinky     1     0       1       0 right         2     6 -0.0333 
-    #>  7     1     0 Blinky     1     0       1       0 right         3     7  0.0146 
-    #>  8     1     0 Blinky     1     0       1       0 right         4     8 -0.0124 
-    #>  9     1     1 Blinky     1     1       0       1 up            1     9 -0.00578
-    #> 10     1     1 Blinky     1     1       0       1 up            2    10 -0.0133 
-    #> 11     1     1 Blinky     1     1       0       1 up            3    11  0.0233 
-    #> 12     1     1 Blinky     1     1       0       1 up            4    12  0.0264 
-    #> 13     0     1 Blinky     0     1      -1       0 left          1    13 -0.0466 
-    #> 14     0     1 Blinky     0     1      -1       0 left          2    14  0.00326
-    #> 15     0     1 Blinky     0     1      -1       0 left          3    15  0.0218 
-    #> 16     0     1 Blinky     0     1      -1       0 left          4    16  0.0528 
-    #> 17     0     0 Blinky     0     0       0      -1 down          1    17  0.00359
-    #> 18     0     0 Blinky     0     0       0      -1 down          2    18  0.0434 
-    #> 19     0     0 Blinky     0     0       0      -1 down          3    19  0.0107 
-    #> 20     0     0 Blinky     0     0       0      -1 down          4    20  0.0741 
+    #>  1     0     0 Blinky     0     0      NA      NA middle        1     1 -0.0563 
+    #>  2     0     0 Blinky     0     0      NA      NA middle        2     2  0.0104 
+    #>  3     0     0 Blinky     0     0      NA      NA middle        3     3  0.0290 
+    #>  4     0     0 Blinky     0     0      NA      NA middle        4     4  0.0655 
+    #>  5     1     0 Blinky     1     0       1       0 right         1     5  0.0401 
+    #>  6     1     0 Blinky     1     0       1       0 right         2     6 -0.0752 
+    #>  7     1     0 Blinky     1     0       1       0 right         3     7  0.0317 
+    #>  8     1     0 Blinky     1     0       1       0 right         4     8  0.0671 
+    #>  9     1     1 Blinky     1     1       0       1 up            1     9 -0.0232 
+    #> 10     1     1 Blinky     1     1       0       1 up            2    10  0.0474 
+    #> 11     1     1 Blinky     1     1       0       1 up            3    11 -0.0657 
+    #> 12     1     1 Blinky     1     1       0       1 up            4    12  0.0256 
+    #> 13     0     1 Blinky     0     1      -1       0 left          1    13 -0.0154 
+    #> 14     0     1 Blinky     0     1      -1       0 left          2    14  0.0821 
+    #> 15     0     1 Blinky     0     1      -1       0 left          3    15 -0.00899
+    #> 16     0     1 Blinky     0     1      -1       0 left          4    16 -0.0381 
+    #> 17     0     0 Blinky     0     0       0      -1 down          1    17  0.120  
+    #> 18     0     0 Blinky     0     0       0      -1 down          2    18 -0.0840 
+    #> 19     0     0 Blinky     0     0       0      -1 down          3    19  0.0988 
+    #> 20     0     0 Blinky     0     0       0      -1 down          4    20 -0.0434 
     #> # … with 1 more variable: noise_y <dbl>
 
 Then, I added (*in a weird way I might say*) the polygons coordinates
@@ -880,26 +882,26 @@ blinky_ghost <- blinky_ghost %>%
     #> # A tibble: 20 x 12
     #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
     #>    <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
-    #>  1 Blinky     0     0      NA      NA middle        1     1  0.00450  0.0233 
-    #>  2 Blinky     0     0      NA      NA middle        2     2  0.0857  -0.0516 
-    #>  3 Blinky     0     0      NA      NA middle        3     3  0.0992  -0.0905 
-    #>  4 Blinky     0     0      NA      NA middle        4     4  0.0455  -0.00619
-    #>  5 Blinky     1     0       1       0 right         1     5  0.00421 -0.0861 
-    #>  6 Blinky     1     0       1       0 right         2     6 -0.0333  -0.0389 
-    #>  7 Blinky     1     0       1       0 right         3     7  0.0146  -0.0217 
-    #>  8 Blinky     1     0       1       0 right         4     8 -0.0124   0.0199 
-    #>  9 Blinky     1     1       0       1 up            1     9 -0.00578  0.0794 
-    #> 10 Blinky     1     1       0       1 up            2    10 -0.0133   0.0170 
-    #> 11 Blinky     1     1       0       1 up            3    11  0.0233   0.00483
-    #> 12 Blinky     1     1       0       1 up            4    12  0.0264  -0.0422 
-    #> 13 Blinky     0     1      -1       0 left          1    13 -0.0466  -0.101  
-    #> 14 Blinky     0     1      -1       0 left          2    14  0.00326  0.0544 
-    #> 15 Blinky     0     1      -1       0 left          3    15  0.0218   0.164  
-    #> 16 Blinky     0     1      -1       0 left          4    16  0.0528   0.0646 
-    #> 17 Blinky     0     0       0      -1 down          1    17  0.00359  0.158  
-    #> 18 Blinky     0     0       0      -1 down          2    18  0.0434   0.0509 
-    #> 19 Blinky     0     0       0      -1 down          3    19  0.0107   0.0742 
-    #> 20 Blinky     0     0       0      -1 down          4    20  0.0741   0.0644 
+    #>  1 Blinky     0     0      NA      NA middle        1     1 -0.0563   0.0209 
+    #>  2 Blinky     0     0      NA      NA middle        2     2  0.0104   0.0118 
+    #>  3 Blinky     0     0      NA      NA middle        3     3  0.0290  -0.0470 
+    #>  4 Blinky     0     0      NA      NA middle        4     4  0.0655  -0.0386 
+    #>  5 Blinky     1     0       1       0 right         1     5  0.0401   0.0282 
+    #>  6 Blinky     1     0       1       0 right         2     6 -0.0752   0.100  
+    #>  7 Blinky     1     0       1       0 right         3     7  0.0317   0.0452 
+    #>  8 Blinky     1     0       1       0 right         4     8  0.0671   0.00236
+    #>  9 Blinky     1     1       0       1 up            1     9 -0.0232   0.0349 
+    #> 10 Blinky     1     1       0       1 up            2    10  0.0474  -0.0371 
+    #> 11 Blinky     1     1       0       1 up            3    11 -0.0657  -0.00225
+    #> 12 Blinky     1     1       0       1 up            4    12  0.0256   0.0687 
+    #> 13 Blinky     0     1      -1       0 left          1    13 -0.0154   0.0478 
+    #> 14 Blinky     0     1      -1       0 left          2    14  0.0821   0.00531
+    #> 15 Blinky     0     1      -1       0 left          3    15 -0.00899  0.0497 
+    #> 16 Blinky     0     1      -1       0 left          4    16 -0.0381  -0.0185 
+    #> 17 Blinky     0     0       0      -1 down          1    17  0.120    0.102  
+    #> 18 Blinky     0     0       0      -1 down          2    18 -0.0840   0.105  
+    #> 19 Blinky     0     0       0      -1 down          3    19  0.0988  -0.0203 
+    #> 20 Blinky     0     0       0      -1 down          4    20 -0.0434   0.0965 
     #> # … with 2 more variables: body <list>, eyes <list>
 
 For ease, it is now a call to one function directly on the poition
@@ -926,7 +928,7 @@ blinky_plot <- base_layer +
   )
 ```
 
-![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
+![](man/figures/README-blinky-plot-static-1.png)<!-- -->
 
 Again, it is better with an animated GIF.
 
@@ -1020,8 +1022,8 @@ animated_points <- maze_layer_points + transition_manual(step)
 
 The ghosts were more tricky (I know, they are ghosts …).
 
-I first retrieved all the positions were a `"big"` bonus point was eaten
-by Pac-Man.
+I first retrieved all the positions wereh a `"big"` bonus point was
+eaten by Pac-Man.
 
 ``` r
 ghosts_vulnerability <- bonus_points_eaten %>%
@@ -1109,7 +1111,7 @@ ggpacman::compute_ghost_status
 #>       )
 #>     )
 #> }
-#> <bytecode: 0x55ac38738010>
+#> <bytecode: 0x56337604acb8>
 #> <environment: namespace:ggpacman>
 ```
 
@@ -1223,16 +1225,16 @@ blinky_moves <- ggpacman::compute_ghost_coord(blinky_ghost)
     #> # A tibble: 48 x 12
     #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
     #>    <chr>  <int> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
-    #>  1 Blinky     1     0      NA      NA middle        1     1  0.0461   2.06e-3
-    #>  2 Blinky     1     0      NA      NA middle        2     2 -0.00489  6.48e-2
-    #>  3 Blinky     1     0      NA      NA middle        3     3  0.0799  -1.60e-2
-    #>  4 Blinky     1     0      NA      NA middle        4     4  0.0121  -4.38e-4
-    #>  5 Blinky     2     0       1       0 right         1     5  0.0470   5.42e-2
-    #>  6 Blinky     2     0       1       0 right         2     6 -0.0596  -3.22e-2
-    #>  7 Blinky     2     0       1       0 right         3     7 -0.0580   1.57e-2
-    #>  8 Blinky     2     0       1       0 right         4     8 -0.0606  -1.62e-2
-    #>  9 Blinky     3     0       1       0 right         1     9 -0.0686  -2.86e-2
-    #> 10 Blinky     3     0       1       0 right         2    10  0.0450   7.31e-2
+    #>  1 Blinky     1     0      NA      NA middle        1     1 -0.0159  -0.0268 
+    #>  2 Blinky     1     0      NA      NA middle        2     2 -0.00849 -0.0175 
+    #>  3 Blinky     1     0      NA      NA middle        3     3  0.0178   0.0228 
+    #>  4 Blinky     1     0      NA      NA middle        4     4  0.0185  -0.0176 
+    #>  5 Blinky     2     0       1       0 right         1     5 -0.0193  -0.0355 
+    #>  6 Blinky     2     0       1       0 right         2     6 -0.0919   0.0120 
+    #>  7 Blinky     2     0       1       0 right         3     7  0.0335  -0.0240 
+    #>  8 Blinky     2     0       1       0 right         4     8  0.00246  0.00176
+    #>  9 Blinky     3     0       1       0 right         1     9 -0.0427   0.0224 
+    #> 10 Blinky     3     0       1       0 right         2    10 -0.00969 -0.0750 
     #> # … with 38 more rows, and 2 more variables: body <list>, eyes <list>
 
 ``` r
