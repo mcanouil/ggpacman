@@ -951,9 +951,7 @@ animate(
 )
 ```
 
-### Plot time ([top](#f-top))
-
-To summarise a little (or a lot).  
+### Plot time ([o summarise a little (or a lot).  
 In the current version, nearly everything is either a dataset or a function and could be used like this.
 
 1. Load and compute the data.
