@@ -67,23 +67,22 @@ But, I am going to go through my code here (you might be interested to actually 
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Maybe I went too far with <a href="https://twitter.com/hashtag/ggplot2?src=hash&amp;ref_src=twsrc%5Etfw">#ggplot2</a> and <a href="https://twitter.com/hashtag/gganimate?src=hash&amp;ref_src=twsrc%5Etfw">#gganimate</a> ...😅<br>What do you think <a href="https://twitter.com/hadleywickham?ref_src=twsrc%5Etfw">@hadleywickham</a> &amp; <a href="https://twitter.com/thomasp85?ref_src=twsrc%5Etfw">@thomasp85</a> , did I go too far or not enough ? (I am planning to add the ghosts 😎) <a href="https://t.co/nkfbti1Etd">pic.twitter.com/nkfbti1Etd</a></p>&mdash; Mickaël CANOUIL (@mickaelcanouil) <a href="https://twitter.com/mickaelcanouil/status/1241760925499170824?ref_src=twsrc%5Etfw">March 22, 2020</a></blockquote>
 
-1. [The packages](#a-top)
-2. [The maze layer](#b-top)
-    1. [The base layer](#b1-top)
-    2. [The grid layer](#b2-top)
-    3. [The bonus points layer](#b3-top)
-3. [Pac-Man character](#c-top)
-4. [The Ghosts characters (Blinky, Pinky, Inky and Clyde)](#d-top)
-    1. [Body](#d1-top)
-    2. [Eyes](#d2-top)
-    3. [Ghost shape](#d3-top)
-5. [How Pac-Man interacts with the maze?](#e-top)
-    1. [Bonus points](#e1-top)
-    2. [Ghost `"weak"` and `"eaten"` states](#e2-top)
-6. [Plot time](#f-top)
+1. [The packages](#the-packages)
+2. [The maze layer](#the-maze-layer)
+    1. [The base layer](#the-base-layer)
+    2. [The grid layer](#the-grid-layer)
+    3. [The bonus points layer](#the-bonus-points-layer)
+3. [Pac-Man character](#pac-man-character)
+4. [The Ghosts characters](#the-ghosts-characters)
+    1. [Body](#body)
+    2. [Eyes](#eyes)
+    3. [Ghost shape](#ghost-shape)
+5. [How Pac-Man interacts with the maze?](#how-pac-man-interacts-with-the-maze)
+    1. [Bonus points](#bonus-points)
+    2. [Ghost `"weak"` and `"eaten"` states](#ghost-weak-and-eaten-states-top)
+6. [Plot time](#plot-time)
 
-
-### The packages ([top](#a-top))
+### The packages
 
 ```{r libraries, results = "hide", message = FALSE, warning = FALSE}
 library("stats")
@@ -99,46 +98,9 @@ library("gganimate")
 library("ggtext")
 ```
 
-```{r, echo = FALSE, results = "hide"}
-print.ggplot <- function(x, newpage = is.null(vp), vp = NULL, ...) {
-  if (is.null(x$theme$plot.background$colour)) {
-    bc <- ggplot2::theme_get()$plot.background$colour
-  } else {
-    bc <- x$theme$plot.background$colour
-  }
+### The maze layer
 
-  ggplot2::set_last_plot(x)
-  if (newpage) {
-    grid::grid.newpage()
-  }
-  grid::grid.rect(gp = grid::gpar(fill = bc, col = bc))
-  grDevices::recordGraphics(
-    requireNamespace("ggplot2", quietly = TRUE),
-    list(),
-    getNamespace("ggplot2")
-  )
-  data <- ggplot2::ggplot_build(x)
-  gtable <- ggplot2::ggplot_gtable(data)
-  if (is.null(vp)) {
-    grid::grid.draw(gtable)
-  } else {
-    if (is.character(vp)) {
-      grid::seekViewport(vp)
-    } else {
-      grid::pushViewport(vp)
-    }
-    grid::grid.draw(gtable)
-    grid::upViewport()
-  }
-
-  invisible(x)
-}
-```
-
-
-### The maze layer ([top](#b-top))
-
-#### The base layer ([top](#b1-top))
+#### The base layer
 
 First thing first, I needed to set-up the base layer, meaning, the maze from Pac-Man.  
 I did start by setting the coordinates of the maze.
@@ -177,7 +139,8 @@ base_layer <- base_layer +
   scale_fill_manual(breaks = names(map_colours), values = map_colours) +
   scale_colour_manual(breaks = names(map_colours), values = map_colours) 
 ```
-```{r, echo = FALSE}
+
+```{r base-layer-plot, echo = FALSE}
 base_layer
 ```
 
@@ -198,7 +161,7 @@ base_layer +
 
 Quite better, isn't it?! 
 
-#### The grid layer ([top](#b2-top))
+#### The grid layer
 
 Here, I am calling "grid", the walls of the maze.  
 For this grid, I started drawing the vertical lines on the left side of the maze (as you may have noticed, the first level is symmetrical).
@@ -364,7 +327,7 @@ base_layer +
 
 *Note: `maze_walls` is a dataset of `ggpacman` (`data("maze_walls", package = "ggpacman")`).*
 
-#### The bonus points layer ([top](#b3-top))
+#### The bonus points layer
 
 The strategy was quite the same as for the grid layer:
 
@@ -415,14 +378,15 @@ maze_layer <- base_layer +
     inherit.aes = FALSE
   )
 ```
-```{r, echo = FALSE}
+
+```{r maze-layer-show, echo = FALSE}
 maze_layer
 ```
 
 
 *Note: `maze_points` is a dataset of `ggpacman` (`data("maze_points", package = "ggpacman")`).*
 
-### Pac-Man character ([top](#c-top))
+### Pac-Man character
 
 It is now time to draw the main character.
 To draw Pac-Man, I needed few things:
@@ -534,7 +498,7 @@ animate(
 
 *Note: `pacman` is a dataset of `ggpacman` (`data("pacman", package = "ggpacman")`).*
 
-### The Ghosts characters (Blinky, Pinky, Inky and Clyde) ([top](#d-top))
+### The Ghosts characters
 
 Time to draw the ghosts, namely: Blinky, Pinky, Inky and Clyde.
 
@@ -705,7 +669,7 @@ blinky_ghost <- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = "Bli
   unnest("direction")
 ```
 
-```{r, echo = FALSE}
+```{r blinky-ghost-static, echo = FALSE}
 blinky_ghost
 ```
 
@@ -722,7 +686,7 @@ blinky_ghost <- blinky_ghost %>%
   )
 ```
 
-```{r, echo = FALSE}
+```{r blinky-ghost-noise, echo = FALSE}
 blinky_ghost
 ```
 
@@ -757,7 +721,7 @@ blinky_ghost <- blinky_ghost %>%
   )
 ```
 
-```{r, echo = FALSE}
+```{r blinky-ghost-show, echo = FALSE}
 blinky_ghost
 ```
 
@@ -783,7 +747,7 @@ blinky_plot <- base_layer +
   )
 ```
 
-```{r, echo = FALSE}
+```{r blinky-plot-static, echo = FALSE}
 blinky_plot
 ```
 
@@ -883,7 +847,7 @@ animate(
 
 The ghosts were more tricky (I know, they are ghosts ...).
 
-I first retrieved all the positions were a `"big"` bonus point was eaten by Pac-Man.
+I first retrieved all the positions wereh a `"big"` bonus point was eaten by Pac-Man.
 
 ```{r vulnerability}
 ghosts_vulnerability <- bonus_points_eaten %>%
