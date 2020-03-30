@@ -9,17 +9,13 @@
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![GitHub
 tag](https://img.shields.io/github/tag/mcanouil/ggpacman.svg?label=latest%20tag)](https://github.com/mcanouil/ggpacman)
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/ggpacman)](https://cran.r-project.org/package=ggpacman)
-[![cran
-checks\_worst](https://cranchecks.info/badges/worst/ggpacman)](https://cran.r-project.org/web/checks/check_results_ggpacman.html)
-[![CRAN\_Download\_total](https://cranlogs.r-pkg.org/badges/ggpacman)](https://cran.r-project.org/package=ggpacman)
 [![R build
 status](https://github.com/mcanouil/ggpacman/workflows/R-CMD-check/badge.svg)](https://github.com/mcanouil/ggpacman/actions)
 <!-- badges: end -->
 
 The goal of `ggpacman` is to …  
-Build a GIF of the game Pac-Man (*not to develop R version of Pac-Man*)
-…
+Build a GIF of the game Pac-Man (*not to develop an R version of Pac-Man
+…*).
 
 ## Installation
 
@@ -72,7 +68,45 @@ Well, it was not that easy after-all … But, I am going to go through my
 code here (you might be interested to actually look at the [commits
 history](https://github.com/mcanouil/ggpacman/commits/master).
 
-### The packages
+<blockquote class="twitter-tweet">
+
+<p lang="en" dir="ltr">
+
+Maybe I went too far with
+<a href="https://twitter.com/hashtag/ggplot2?src=hash&amp;ref_src=twsrc%5Etfw">\#ggplot2</a>
+and
+<a href="https://twitter.com/hashtag/gganimate?src=hash&amp;ref_src=twsrc%5Etfw">\#gganimate</a>
+…😅<br>What do you think
+<a href="https://twitter.com/hadleywickham?ref_src=twsrc%5Etfw">@hadleywickham</a>
+&
+<a href="https://twitter.com/thomasp85?ref_src=twsrc%5Etfw">@thomasp85</a>
+, did I go too far or not enough ? (I am planning to add the ghosts 😎)
+<a href="https://t.co/nkfbti1Etd">pic.twitter.com/nkfbti1Etd</a>
+
+</p>
+
+— Mickaël CANOUIL (@mickaelcanouil)
+<a href="https://twitter.com/mickaelcanouil/status/1241760925499170824?ref_src=twsrc%5Etfw">March
+22, 2020</a>
+
+</blockquote>
+
+1.  [The packages](#a-top)
+2.  [The maze layer](#b-top)
+    1.  [The base layer](#b1-top)
+    2.  [The grid layer](#b2-top)
+    3.  [The bonus points layer](#b3-top)
+3.  [Pac-Man character](#c-top)
+4.  [The Ghosts characters (Blinky, Pinky, Inky and Clyde)](#d-top)
+    1.  [Body](#d1-top)
+    2.  [Eyes](#d2-top)
+    3.  [Ghost shape](#d3-top)
+5.  [How Pac-Man interacts with the maze?](#e-top)
+    1.  [Bonus points](#e1-top)
+    2.  [Ghost `"weak"` and `"eaten"` states](#e2-top)
+6.  [Plot time](#f-top)
+
+### The packages ([top](#a-top))
 
 ``` r
 library("stats")
@@ -88,9 +122,9 @@ library("gganimate")
 library("ggtext")
 ```
 
-### The maze layer
+### The maze layer ([top](#b-top))
 
-#### The base layer
+#### The base layer ([top](#b1-top))
 
 First thing first, I needed to set-up the base layer, meaning, the maze
 from Pac-Man.  
@@ -107,10 +141,10 @@ base_layer <- ggplot() +
   coord_fixed(xlim = c(0, 20), ylim = c(0, 26))
 ```
 
-For later use, let’s add some scales (actually those scales, where
+For later use, I defined some scales (actually those scales, where
 defined way after chronologically speaking). I am using those to define
-size and colours for all the `geom_*()` I am going to use to achieve the
-Pac-Man GIF.
+sizes and colours for all the geometries I am going to use to achieve
+the Pac-Man GIF.
 
 ``` r
 map_colours <- c(
@@ -131,13 +165,12 @@ base_layer <- base_layer +
   scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5, "eaten" = 3)) +
   scale_fill_manual(breaks = names(map_colours), values = map_colours) +
   scale_colour_manual(breaks = names(map_colours), values = map_colours) 
-base_layer
 ```
 
-![](man/figures/README-base-layer-colours-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-2-1.png)<!-- -->
 
 My `base_layer` here is not really helpful, so I temporarily added some
-elements to help me draw everything.  
+elements to help me draw everything on it.  
 *Note*: I won’t use it in the following.
 
 ``` r
@@ -155,10 +188,11 @@ base_layer +
 
 Quite better, isn’t it?\!
 
-#### The grid layer
+#### The grid layer ([top](#b2-top))
 
-I started drawing the vertical lines on the left (as you may have
-noticed, the first level is symmetrical).
+Here, I am calling “grid”, the walls of the maze.  
+For this grid, I started drawing the vertical lines on the left side of
+the maze (as you may have noticed, the first level is symmetrical).
 
 ``` r
 left_vertical_segments <- tribble(
@@ -198,7 +232,8 @@ base_layer +
 
 ![](man/figures/README-left-vertical-plot-1.png)<!-- -->
 
-Let’s add the horizontal lines (still on the left side of the maze)\!
+Then, I added the horizontal lines (still only on the left side of the
+maze)\!
 
 ``` r
 left_horizontal_segments <- tribble(
@@ -247,8 +282,9 @@ base_layer +
 
 ![](man/figures/README-left-plot-1.png)<!-- -->
 
-Now, we can see the maze. As I said earlier, the first level is
-symmetrical, let’s use `left_segments` to compute a `right_segments`.
+The maze is slowly appearing, but surely. As I wrote earlier, the first
+level is symmetrical, so I used my left lines `left_segments` to compute
+all the lignes on the right `right_segments`.
 
 ``` r
 right_segments <-  mutate(
@@ -271,8 +307,11 @@ base_layer +
 
 ![](man/figures/README-right-plot-1.png)<!-- -->
 
-Now, let’s add the missing vertical lines in the middle and the ghost
-“house” door.
+The middle vertical lines were missing, *i.e.*, I did not want to plot
+them twice, which would have happen, if I added these in
+`left_segments`.  
+Also, the “door” of the ghost spawn area is missing. I added the door
+and the missing vertical walls in the end.
 
 ``` r
 centre_vertical_segments <- tribble(
@@ -285,7 +324,7 @@ centre_vertical_segments <- tribble(
 door_segment <- tibble(x = 9, y = 15, xend = 11, yend = 15, type = "door")
 ```
 
-Combine all the segments and draw them all.
+Finally, I combined all the segments and drew them all.
 
 ``` r
 maze_walls <- bind_rows(
@@ -310,10 +349,12 @@ base_layer +
 
 ![](man/figures/README-maze-plot-1.png)<!-- -->
 
-The maze is complete, but no-one can actually see the door, since it
-appears the same way at the walls. You may have noticed, I added a
-column `type`, which can hold two values: `wall` and `door`. I am going
-to use that as an aesthetic, you may already have guessed which ones.  
+The maze is now complete, but no-one can actually see the door, since it
+appears the same way as the walls.  
+You may have noticed, I added a column named `type`.  
+`type` can currently hold two values: `"wall"` and `"door"`.  
+I am going to use `type` as values for two aesthetics, you may already
+have guessed which ones.  
 The answer is the `colour` and `size` aesthetics.
 
 ``` r
@@ -331,7 +372,7 @@ base_layer +
 *Note: `maze_walls` is a dataset of `ggpacman` (`data("maze_walls",
 package = "ggpacman")`).*
 
-#### The bonus points layer
+#### The bonus points layer ([top](#b3-top))
 
 The strategy was quite the same as for the grid layer:
 
@@ -384,21 +425,20 @@ maze_layer <- base_layer +
     mapping = aes(x = x, y = y, size = type, colour = type),
     inherit.aes = FALSE
   )
-maze_layer
 ```
 
-![](man/figures/README-maze-point-plot-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
 
 *Note: `maze_points` is a dataset of `ggpacman` (`data("maze_points",
 package = "ggpacman")`).*
 
-### Pac-Man character
+### Pac-Man character ([top](#c-top))
 
-Time to draw the main character. To draw Pac-Man, I needed few things
-first:
+It is now time to draw the main character. To draw Pac-Man, I needed few
+things:
 
-  - Pac-Man moves, *i.e.*, all the coordinates where Pac-Man is supposed
-    to be at every step.
+  - The Pac-Man moves, *i.e.*, all the coordinates where Pac-Man is
+    supposed to be at every `step`.
     
     ``` r
     data("pacman", package = "ggpacman")
@@ -430,12 +470,13 @@ first:
     
     ![](man/figures/README-pacman-position-plot-1.png)<!-- -->
 
-  - Pac-Man shape (open and closed mouth). Since, Pac-Man is not a
-    complete circle shape, I used `geom_arc_bar()`, and defined the
+  - The Pac-Man shape (open and closed mouth). Since, Pac-Man is not a
+    complete circle shape, I used `geom_arc_bar()` (from
+    [`ggforce`](https://ggforce.data-imaginist.com/)), and defined the
     properties of each state of Pac-Man based on the aesthetics required
-    by it. *Note*: At first, I wanted a smooth animation/transition of
-    Pac-Man opening and closing its mouth, this is why there are four
-    `"close_"` states.
+    by this function. *Note*: At first, I wanted a smooth
+    animation/transition of Pac-Man opening and closing its mouth, this
+    is why there are four `"close_"` states.
     
     ``` r
     pacman_state <- tribble(
@@ -455,11 +496,7 @@ first:
     ggplot() +
       geom_arc_bar(
         data = pacman_state,
-        mapping = aes(
-          x0 = 0, y0 = 0,
-          r0 = 0, r = 0.5,
-          start = start, end = end
-        ),
+        mapping = aes(x0 = 0, y0 = 0, r0 = 0, r = 0.5, start = start, end = end),
         fill = "yellow",
         inherit.aes = FALSE
       ) +
@@ -479,14 +516,11 @@ direction of movement🎖
 
 — Thomas Lin Pedersen (@thomasp85)
 <a href="https://twitter.com/thomasp85/status/1241767912370774020?ref_src=twsrc%5Etfw">March
-22,
-2020</a>
+22, 2020</a>
 
 </blockquote>
 
-<!-- <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> -->
-
-Once those things available, how to make Pac-Man looks where he is
+Once those things available, how to make Pac-Man look where he is
 headed?  
 Short answer, I just computed the differences between two successive
 positions of Pac-Man and added both open/close state to a new column
@@ -499,8 +533,7 @@ pacman %>%
     state_x = sign(x - lag(x)),
     state_y = sign(y - lag(y)),
     state = case_when(
-      (is.na(state_x) | state_x %in% 0) &
-        (is.na(state_y) | state_y %in% 0) ~ list(c("open_right", "close_right")),
+      (is.na(state_x) | state_x %in% 0) & (is.na(state_y) | state_y %in% 0) ~ list(c("open_right", "close_right")),
       state_x == 1 & state_y == 0 ~ list(c("open_right", "close_right")),
       state_x == -1 & state_y == 0 ~ list(c("open_left", "close_left")),
       state_x == 0 & state_y == -1 ~ list(c("open_down", "close_down")),
@@ -525,8 +558,9 @@ pacman %>%
 ```
 
 Here, in preparation for [`gganimate`](https://gganimate.com/), I also
-added a column `step` before merging the new upgraded `pacman` with the
-Pac-Man `state` column with the `pacman_state` defined earlier.
+added a column `step` before merging the new upgraded `pacman` (*i.e.*,
+with the Pac-Man `state` column) with the `pacman_state` defined
+earlier.
 
 ``` r
 pacman_moves <- ggpacman::compute_pacman_coord(pacman)
@@ -551,20 +585,14 @@ pacman_moves
 maze_layer +
   geom_arc_bar(
     data = pacman_moves,
-    mapping = aes(
-      x0 = x, y0 = y,
-      r0 = 0, r = 0.5,
-      start = start, end = end,
-      colour = colour, fill = colour,
-      group = step
-    ),
+    mapping = aes(x0 = x, y0 = y, r0 = 0, r = 0.5, start = start, end = end, colour = colour, fill = colour, group = step),
     inherit.aes = FALSE
   )
 ```
 
 ![](man/figures/README-pacman-moves-plots-1.png)<!-- -->
 
-We can’t see much, right?  
+You can’t see much?\!  
 Ok, perhaps it’s time to use [`gganimate`](https://gganimate.com/).  
 I am going to animate Pac-Man based on the column `step`, which is, if
 you looked at the code above, just the line number of `pacman_moves`.
@@ -573,13 +601,7 @@ you looked at the code above, just the line number of `pacman_moves`.
 animated_pacman <- maze_layer +
   geom_arc_bar(
     data = pacman_moves,
-    mapping = aes(
-      x0 = x, y0 = y,
-      r0 = 0, r = 0.5,
-      start = start, end = end,
-      colour = colour, fill = colour,
-      group = step
-    ),
+    mapping = aes(x0 = x, y0 = y, r0 = 0, r = 0.5, start = start, end = end, colour = colour, fill = colour, group = step),
     inherit.aes = FALSE
   ) + 
   transition_manual(step)
@@ -590,9 +612,15 @@ animated_pacman <- maze_layer +
 *Note: `pacman` is a dataset of `ggpacman` (`data("pacman", package =
 "ggpacman")`).*
 
-### The Ghosts characters (Blinky, Pinky, Inky and Clyde)
+### The Ghosts characters (Blinky, Pinky, Inky and Clyde) ([top](#d-top))
 
-#### Body
+Time to draw the ghosts, namely: Blinky, Pinky, Inky and Clyde.
+
+#### Body ([top](#d1-top))
+
+I started with the body, especially the top and the bottom part of the
+ghost which are half circle (or at least I chose this) and use again
+`geom_arc_bar()`.
 
 ``` r
 ghost_arc <- unnest(tribble(
@@ -616,9 +644,14 @@ top <- ggplot() +
 
 ![](man/figures/README-ghost-top-plot-1.png)<!-- -->
 
+I retrieved the coordinates of the created polygon, using
+`ggplot_build()`.
+
 ``` r
 top_polygon <- ggplot_build(top)$data[[1]][, c("x", "y")]
 ```
+
+And I proceeded the same way for the bottom part of the ghost.
 
 ``` r
 bottom <- ggplot() +
@@ -639,6 +672,9 @@ bottom <- ggplot() +
 bottom_polygon <- ggplot_build(bottom)$data[[1]][, c("x", "y")]
 ```
 
+Then, I just added one point to “properly” link the top and the bottom
+part.
+
 ``` r
 ghost_body <- bind_rows(
   top_polygon[-nrow(top_polygon), ],
@@ -646,6 +682,8 @@ ghost_body <- bind_rows(
   bottom_polygon
 )
 ```
+
+I finally got the whole ghost shape I was looking for.
 
 ``` r
 ggplot() +
@@ -660,9 +698,16 @@ ggplot() +
 ![](man/figures/README-ghost-body-plot-1.png)<!-- -->
 
 *Note: `ghost_body` is a dataset of `ggpacman` (`data("ghost_body",
-package = "ggpacman")`).*
+package = "ggpacman")`).*  
+*Note: `ghost_body` definitely needs some code refactoring.*
 
-#### Eyes
+#### Eyes ([top](#d2-top))
+
+The eyes are quite easy to draw, they are just circles, but …  
+As for Pac-Man before, I wanted the ghosts to look where they are
+headed.  
+This implies moving the iris one way or the other, and so I defined five
+states for the iris: right, down, left, up and middle.
 
 ``` r
 ghost_eyes <- tribble(
@@ -703,7 +748,9 @@ ggplot() +
 *Note: `ghost_eyes` is a dataset of `ggpacman` (`data("ghost_eyes",
 package = "ggpacman")`).*
 
-#### Ghost shape
+#### Ghost shape ([top](#d3-top))
+
+I had the whole ghost shape and the eyes.
 
 ``` r
 ggplot() +
@@ -726,6 +773,11 @@ ggplot() +
 
 ![](man/figures/README-ghost-shape-plot-1.png)<!-- -->
 
+Again, same as for Pac-Man, in order to know where the ghosts are
+supposed to look, I computed the differences of each successive
+positions of the ghosts and I added the corresponding
+directions.
+
 ``` r
 blinky_ghost <- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = "Blinky") %>%
   unnest(c("x", "y")) %>%
@@ -735,76 +787,66 @@ blinky_ghost <- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = "Bli
     state_x = sign(round(x) - lag(round(x))),
     state_y = sign(round(y) - lag(round(y))),
     direction = case_when(
-      (is.na(state_x) | state_x %in% 0) &
-        (is.na(state_y) | state_y %in% 0) ~ "middle",
+      (is.na(state_x) | state_x %in% 0) & (is.na(state_y) | state_y %in% 0) ~ "middle",
       state_x == 1 & state_y == 0 ~ "right",
       state_x == -1 & state_y == 0 ~ "left",
       state_x == 0 & state_y == -1 ~ "down",
       state_x == 0 & state_y == 1 ~ "up"
     )
   ) %>%
-  unnest("direction") %>%
-  mutate(state = list(1:4)) %>%
-  unnest("state")
-blinky_ghost
-#> # A tibble: 20 x 9
-#>        x     y colour    X0    Y0 state_x state_y direction state
-#>    <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int>
-#>  1     0     0 Blinky     0     0      NA      NA middle        1
-#>  2     0     0 Blinky     0     0      NA      NA middle        2
-#>  3     0     0 Blinky     0     0      NA      NA middle        3
-#>  4     0     0 Blinky     0     0      NA      NA middle        4
-#>  5     1     0 Blinky     1     0       1       0 right         1
-#>  6     1     0 Blinky     1     0       1       0 right         2
-#>  7     1     0 Blinky     1     0       1       0 right         3
-#>  8     1     0 Blinky     1     0       1       0 right         4
-#>  9     1     1 Blinky     1     1       0       1 up            1
-#> 10     1     1 Blinky     1     1       0       1 up            2
-#> 11     1     1 Blinky     1     1       0       1 up            3
-#> 12     1     1 Blinky     1     1       0       1 up            4
-#> 13     0     1 Blinky     0     1      -1       0 left          1
-#> 14     0     1 Blinky     0     1      -1       0 left          2
-#> 15     0     1 Blinky     0     1      -1       0 left          3
-#> 16     0     1 Blinky     0     1      -1       0 left          4
-#> 17     0     0 Blinky     0     0       0      -1 down          1
-#> 18     0     0 Blinky     0     0       0      -1 down          2
-#> 19     0     0 Blinky     0     0       0      -1 down          3
-#> 20     0     0 Blinky     0     0       0      -1 down          4
+  unnest("direction")
 ```
 
+    #> # A tibble: 5 x 8
+    #>       x     y colour    X0    Y0 state_x state_y direction
+    #>   <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>    
+    #> 1     0     0 Blinky     0     0      NA      NA middle   
+    #> 2     1     0 Blinky     1     0       1       0 right    
+    #> 3     1     1 Blinky     1     1       0       1 up       
+    #> 4     0     1 Blinky     0     1      -1       0 left     
+    #> 5     0     0 Blinky     0     0       0      -1 down
+
+I also added some noise around the position, *i.e.*, four noised
+position at each actual position of a ghost.
+
 ``` r
-blinky_ghost <- blinky_ghost %>% 
+blinky_ghost <- blinky_ghost %>%
+  mutate(state = list(1:4)) %>%
+  unnest("state") %>% 
   mutate(
     step = 1:n(),
     noise_x = rnorm(n(), mean = 0, sd = 0.05),
     noise_y = rnorm(n(), mean = 0, sd = 0.05)
   )
-blinky_ghost
-#> # A tibble: 20 x 12
-#>        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x
-#>    <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>
-#>  1     0     0 Blinky     0     0      NA      NA middle        1     1  1.70e-2
-#>  2     0     0 Blinky     0     0      NA      NA middle        2     2  2.94e-2
-#>  3     0     0 Blinky     0     0      NA      NA middle        3     3 -6.37e-2
-#>  4     0     0 Blinky     0     0      NA      NA middle        4     4  2.46e-2
-#>  5     1     0 Blinky     1     0       1       0 right         1     5 -5.89e-2
-#>  6     1     0 Blinky     1     0       1       0 right         2     6  3.15e-2
-#>  7     1     0 Blinky     1     0       1       0 right         3     7  7.03e-3
-#>  8     1     0 Blinky     1     0       1       0 right         4     8  4.88e-2
-#>  9     1     1 Blinky     1     1       0       1 up            1     9 -4.41e-2
-#> 10     1     1 Blinky     1     1       0       1 up            2    10 -1.62e-2
-#> 11     1     1 Blinky     1     1       0       1 up            3    11 -5.27e-2
-#> 12     1     1 Blinky     1     1       0       1 up            4    12 -3.19e-2
-#> 13     0     1 Blinky     0     1      -1       0 left          1    13 -6.48e-2
-#> 14     0     1 Blinky     0     1      -1       0 left          2    14 -1.43e-2
-#> 15     0     1 Blinky     0     1      -1       0 left          3    15 -1.68e-2
-#> 16     0     1 Blinky     0     1      -1       0 left          4    16  9.09e-2
-#> 17     0     0 Blinky     0     0       0      -1 down          1    17  6.70e-2
-#> 18     0     0 Blinky     0     0       0      -1 down          2    18 -3.49e-4
-#> 19     0     0 Blinky     0     0       0      -1 down          3    19 -6.59e-2
-#> 20     0     0 Blinky     0     0       0      -1 down          4    20 -1.09e-2
-#> # … with 1 more variable: noise_y <dbl>
 ```
+
+    #> # A tibble: 20 x 12
+    #>        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x
+    #>    <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>
+    #>  1     0     0 Blinky     0     0      NA      NA middle        1     1  0.00450
+    #>  2     0     0 Blinky     0     0      NA      NA middle        2     2  0.0857 
+    #>  3     0     0 Blinky     0     0      NA      NA middle        3     3  0.0992 
+    #>  4     0     0 Blinky     0     0      NA      NA middle        4     4  0.0455 
+    #>  5     1     0 Blinky     1     0       1       0 right         1     5  0.00421
+    #>  6     1     0 Blinky     1     0       1       0 right         2     6 -0.0333 
+    #>  7     1     0 Blinky     1     0       1       0 right         3     7  0.0146 
+    #>  8     1     0 Blinky     1     0       1       0 right         4     8 -0.0124 
+    #>  9     1     1 Blinky     1     1       0       1 up            1     9 -0.00578
+    #> 10     1     1 Blinky     1     1       0       1 up            2    10 -0.0133 
+    #> 11     1     1 Blinky     1     1       0       1 up            3    11  0.0233 
+    #> 12     1     1 Blinky     1     1       0       1 up            4    12  0.0264 
+    #> 13     0     1 Blinky     0     1      -1       0 left          1    13 -0.0466 
+    #> 14     0     1 Blinky     0     1      -1       0 left          2    14  0.00326
+    #> 15     0     1 Blinky     0     1      -1       0 left          3    15  0.0218 
+    #> 16     0     1 Blinky     0     1      -1       0 left          4    16  0.0528 
+    #> 17     0     0 Blinky     0     0       0      -1 down          1    17  0.00359
+    #> 18     0     0 Blinky     0     0       0      -1 down          2    18  0.0434 
+    #> 19     0     0 Blinky     0     0       0      -1 down          3    19  0.0107 
+    #> 20     0     0 Blinky     0     0       0      -1 down          4    20  0.0741 
+    #> # … with 1 more variable: noise_y <dbl>
+
+Then, I added (*in a weird way I might say*) the polygons coordinates
+for the body and the eyes.
 
 ``` r
 blinky_ghost <- blinky_ghost %>% 
@@ -833,32 +875,36 @@ blinky_ghost <- blinky_ghost %>%
     x = NULL,
     y = NULL
   )
-blinky_ghost
-#> # A tibble: 20 x 12
-#>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
-#>    <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
-#>  1 Blinky     0     0      NA      NA middle        1     1  1.70e-2  0.0677 
-#>  2 Blinky     0     0      NA      NA middle        2     2  2.94e-2 -0.0244 
-#>  3 Blinky     0     0      NA      NA middle        3     3 -6.37e-2 -0.0136 
-#>  4 Blinky     0     0      NA      NA middle        4     4  2.46e-2 -0.0582 
-#>  5 Blinky     1     0       1       0 right         1     5 -5.89e-2 -0.0323 
-#>  6 Blinky     1     0       1       0 right         2     6  3.15e-2  0.0506 
-#>  7 Blinky     1     0       1       0 right         3     7  7.03e-3  0.0118 
-#>  8 Blinky     1     0       1       0 right         4     8  4.88e-2  0.0910 
-#>  9 Blinky     1     1       0       1 up            1     9 -4.41e-2  0.0790 
-#> 10 Blinky     1     1       0       1 up            2    10 -1.62e-2  0.0272 
-#> 11 Blinky     1     1       0       1 up            3    11 -5.27e-2  0.00900
-#> 12 Blinky     1     1       0       1 up            4    12 -3.19e-2  0.0534 
-#> 13 Blinky     0     1      -1       0 left          1    13 -6.48e-2 -0.106  
-#> 14 Blinky     0     1      -1       0 left          2    14 -1.43e-2 -0.0288 
-#> 15 Blinky     0     1      -1       0 left          3    15 -1.68e-2  0.0153 
-#> 16 Blinky     0     1      -1       0 left          4    16  9.09e-2  0.0151 
-#> 17 Blinky     0     0       0      -1 down          1    17  6.70e-2 -0.0306 
-#> 18 Blinky     0     0       0      -1 down          2    18 -3.49e-4  0.0584 
-#> 19 Blinky     0     0       0      -1 down          3    19 -6.59e-2  0.0807 
-#> 20 Blinky     0     0       0      -1 down          4    20 -1.09e-2  0.0192 
-#> # … with 2 more variables: body <list>, eyes <list>
 ```
+
+    #> # A tibble: 20 x 12
+    #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
+    #>    <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
+    #>  1 Blinky     0     0      NA      NA middle        1     1  0.00450  0.0233 
+    #>  2 Blinky     0     0      NA      NA middle        2     2  0.0857  -0.0516 
+    #>  3 Blinky     0     0      NA      NA middle        3     3  0.0992  -0.0905 
+    #>  4 Blinky     0     0      NA      NA middle        4     4  0.0455  -0.00619
+    #>  5 Blinky     1     0       1       0 right         1     5  0.00421 -0.0861 
+    #>  6 Blinky     1     0       1       0 right         2     6 -0.0333  -0.0389 
+    #>  7 Blinky     1     0       1       0 right         3     7  0.0146  -0.0217 
+    #>  8 Blinky     1     0       1       0 right         4     8 -0.0124   0.0199 
+    #>  9 Blinky     1     1       0       1 up            1     9 -0.00578  0.0794 
+    #> 10 Blinky     1     1       0       1 up            2    10 -0.0133   0.0170 
+    #> 11 Blinky     1     1       0       1 up            3    11  0.0233   0.00483
+    #> 12 Blinky     1     1       0       1 up            4    12  0.0264  -0.0422 
+    #> 13 Blinky     0     1      -1       0 left          1    13 -0.0466  -0.101  
+    #> 14 Blinky     0     1      -1       0 left          2    14  0.00326  0.0544 
+    #> 15 Blinky     0     1      -1       0 left          3    15  0.0218   0.164  
+    #> 16 Blinky     0     1      -1       0 left          4    16  0.0528   0.0646 
+    #> 17 Blinky     0     0       0      -1 down          1    17  0.00359  0.158  
+    #> 18 Blinky     0     0       0      -1 down          2    18  0.0434   0.0509 
+    #> 19 Blinky     0     0       0      -1 down          3    19  0.0107   0.0742 
+    #> 20 Blinky     0     0       0      -1 down          4    20  0.0741   0.0644 
+    #> # … with 2 more variables: body <list>, eyes <list>
+
+For ease, it is now a call to one function directly on the poition
+matrix of a
+ghost.
 
 ``` r
 blinky_ghost <- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = "Blinky")
@@ -878,20 +924,30 @@ blinky_plot <- base_layer +
     mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part, group = step),
     inherit.aes = FALSE
   )
-#> Coordinate system already present. Adding new coordinate system, which will replace the existing one.
 ```
+
+![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
+
+Again, it is better with an animated GIF.
 
 ``` r
 animated_blinky <- blinky_plot + transition_manual(step)
 ```
 
-    #> nframes and fps adjusted to match transition
-
 ![](man/figures/README-blinky-plot-animated-1.gif)<!-- -->
 
-### How Pac-Man interacts with the maze?
+### How Pac-Man interacts with the maze? ([top](#e-top))
 
-#### Bonus points
+#### Bonus points ([top](#e1-top))
+
+For ease, I am using some functions I defined to go quickly to the
+results of the first part of this readme.  
+The idea here is to look at all the position in common between Pac-Man
+(`pacman_moves`) and the bonus points (`maze_points`).  
+Each time Pac-Man was at the same place as a bonus point, I defined a
+status `"eaten"` for all values of `step` after.  
+I ended up with a big table with position and the state of the bonus
+points.
 
 ``` r
 pacman_moves <- ggpacman::compute_pacman_coord(get(data("pacman", package = "ggpacman")))
@@ -918,19 +974,41 @@ right_join(get(data("maze_points")), pacman_moves, by = c("x", "y")) %>%
 #> # … with 45,140 more rows
 ```
 
+Again, for ease, I am using a function I defined to compute
+everything.
+
 ``` r
 pacman_moves <- ggpacman::compute_pacman_coord(get(data("pacman", package = "ggpacman")))
 bonus_points_eaten <- ggpacman::compute_points_eaten(get(data("maze_points")), pacman_moves)
+```
+
+If you don’t recall, `maze_layer` already includes a geometry with the
+bonus points.
+
+![](man/figures/README-reminder-maze-1.png)<!-- -->
+
+I could have change this geometry (*i.e.*, `geom_point()`), but I did
+not, and draw a new geometry on top of the previous ones.  
+Do you remember the values of the scale for the size
+aesthetic?
+
+``` r
+scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5, "eaten" = 3))
+```
+
+``` r
 maze_layer_points <- maze_layer +
   geom_point(
     data = bonus_points_eaten,
     mapping = aes(x = x, y = y, colour = colour, size = colour, group = step),
     inherit.aes = FALSE
   )
-maze_layer_points
 ```
 
 ![](man/figures/README-points-eaten-plot-1.png)<!-- -->
+
+A new animation to see, how the new geometry is overlpping the previous
+one as `step` increases.
 
 ``` r
 animated_points <- maze_layer_points + transition_manual(step)
@@ -938,7 +1016,12 @@ animated_points <- maze_layer_points + transition_manual(step)
 
 ![](man/figures/README-points-eaten-plot-animated-1.gif)<!-- -->
 
-#### Ghost “weak” and “eaten” status
+#### Ghost `"weak"` and `"eaten"` states ([top](#e2-top))
+
+The ghosts were more tricky (I know, they are ghosts …).
+
+I first retrieved all the positions were a `"big"` bonus point was eaten
+by Pac-Man.
 
 ``` r
 ghosts_vulnerability <- bonus_points_eaten %>%
@@ -953,22 +1036,24 @@ ghosts_vulnerability <- bonus_points_eaten %>%
     y = NULL
   ) %>%
   unnest("step")
-ghosts_vulnerability
-#> # A tibble: 93 x 3
-#>    step_init  step vulnerability
-#>        <dbl> <dbl> <lgl>        
-#>  1        79    79 TRUE         
-#>  2        79    80 TRUE         
-#>  3        79    81 TRUE         
-#>  4        79    82 TRUE         
-#>  5        79    83 TRUE         
-#>  6        79    84 TRUE         
-#>  7        79    85 TRUE         
-#>  8        79    86 TRUE         
-#>  9        79    87 TRUE         
-#> 10        79    88 TRUE         
-#> # … with 83 more rows
 ```
+
+    #> # A tibble: 93 x 3
+    #>    step_init  step vulnerability
+    #>        <dbl> <dbl> <lgl>        
+    #>  1        79    79 TRUE         
+    #>  2        79    80 TRUE         
+    #>  3        79    81 TRUE         
+    #>  4        79    82 TRUE         
+    #>  5        79    83 TRUE         
+    #>  6        79    84 TRUE         
+    #>  7        79    85 TRUE         
+    #>  8        79    86 TRUE         
+    #>  9        79    87 TRUE         
+    #> 10        79    88 TRUE         
+    #> # … with 83 more rows
+
+This is part of a bigger function (I won’t dive too deep into it).
 
 ``` r
 ggpacman::compute_ghost_status
@@ -1024,11 +1109,18 @@ ggpacman::compute_ghost_status
 #>       )
 #>     )
 #> }
-#> <bytecode: 0x55a6e92a3930>
+#> <bytecode: 0x55ac38738010>
 #> <environment: namespace:ggpacman>
 ```
 
+The goal of this function, is to compute the different states of a
+ghost, according to the bonus points eaten and, of course, the current
+Pac-Man position at a determined
+`step`.
+
 ``` r
+pacman_moves <- ggpacman::compute_pacman_coord(get(data("pacman", package = "ggpacman")))
+bonus_points_eaten <- ggpacman::compute_points_eaten(get(data("maze_points")), pacman_moves)
 ghost_moves <- ggpacman::compute_ghost_status(
   ghost = get(data("blinky", package = "ggpacman")),
   pacman_moves = pacman_moves,
@@ -1116,6 +1208,9 @@ ghost_moves %>%
 #> 75  297        up       Blinky         FALSE
 ```
 
+To simplify a little, below a small example of a ghost moving in one
+direction with predetermined states.
+
 ``` r
 blinky_ghost <- bind_rows(
   tibble(x = 1:4, y = 0, colour = "Blinky"),
@@ -1124,6 +1219,21 @@ blinky_ghost <- bind_rows(
 )
 blinky_moves <- ggpacman::compute_ghost_coord(blinky_ghost)
 ```
+
+    #> # A tibble: 48 x 12
+    #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
+    #>    <chr>  <int> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
+    #>  1 Blinky     1     0      NA      NA middle        1     1  0.0461   2.06e-3
+    #>  2 Blinky     1     0      NA      NA middle        2     2 -0.00489  6.48e-2
+    #>  3 Blinky     1     0      NA      NA middle        3     3  0.0799  -1.60e-2
+    #>  4 Blinky     1     0      NA      NA middle        4     4  0.0121  -4.38e-4
+    #>  5 Blinky     2     0       1       0 right         1     5  0.0470   5.42e-2
+    #>  6 Blinky     2     0       1       0 right         2     6 -0.0596  -3.22e-2
+    #>  7 Blinky     2     0       1       0 right         3     7 -0.0580   1.57e-2
+    #>  8 Blinky     2     0       1       0 right         4     8 -0.0606  -1.62e-2
+    #>  9 Blinky     3     0       1       0 right         1     9 -0.0686  -2.86e-2
+    #> 10 Blinky     3     0       1       0 right         2    10  0.0450   7.31e-2
+    #> # … with 38 more rows, and 2 more variables: body <list>, eyes <list>
 
 ``` r
 blinky_plot <- base_layer +
@@ -1138,18 +1248,38 @@ blinky_plot <- base_layer +
     mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part, group = step),
     inherit.aes = FALSE
   )
-#> Coordinate system already present. Adding new coordinate system, which will replace the existing one.
 ```
+
+![](man/figures/README-blinky-plot-line-1.png)<!-- -->
+
+I am sure, you remember all the colours and their mapped values from the
+beginning, so you probably won’t need the following to understand of the
+ghost
+disappaered.
+
+``` r
+"Blinky" = "red", "Blinky_weak" = "blue", "Blinky_eaten" = "transparent",
+```
+
+*Note: yes, `"transparent"` is a colour and a very handy one.*
+
+A new animation to see our little Blinky in action?
 
 ``` r
 animated_blinky <- blinky_plot + transition_manual(step)
 ```
 
-    #> nframes and fps adjusted to match transition
-
 ![](man/figures/README-blinky-state-plot-animated-1.gif)<!-- -->
 
-## Plot time
+### Plot time ([top](#f-top))
+
+To summarise a little (or a lot).  
+In the current version, nearly everything is either a dataset or a
+function and could be used like this.
+
+1.  Load and compute the data.
+
+<!-- end list -->
 
 ``` r
 data("pacman", package = "ggpacman")
@@ -1174,6 +1304,10 @@ map_colours <- c(
   "Clyde" = "orange", "Clyde_weak" = "blue", "Clyde_eaten" = "transparent"
 )
 ```
+
+2.  Build the base layer with the maze.
+
+<!-- end list -->
 
 ``` r
 base_grid <- ggplot() + 
@@ -1206,10 +1340,17 @@ base_grid <- ggplot() +
     mapping = aes(x = x, y = y, label = label, colour = label, group = step),
     size = 6
   )
+```
+
+``` r
 base_grid
 ```
 
-![](man/figures/README-plot-time-base-1.png)<!-- -->
+![](man/figures/README-base-grid-final-1.png)<!-- -->
+
+3.  Draw the `"eaten"` bonus points geometry.
+
+<!-- end list -->
 
 ``` r
 p_points <- list(
@@ -1219,10 +1360,17 @@ p_points <- list(
     inherit.aes = FALSE
   )
 )
+```
+
+``` r
 base_grid + p_points
 ```
 
-![](man/figures/README-plot-time-points-1.png)<!-- -->
+![](man/figures/README-base-grid-points-final-1.png)<!-- -->
+
+4.  Draw the main character (I am talking about Pac-Man …)
+
+<!-- end list -->
 
 ``` r
 p_pacman <- list(
@@ -1238,10 +1386,18 @@ p_pacman <- list(
     inherit.aes = FALSE
   )
 )
+```
+
+``` r
 base_grid + p_pacman
 ```
 
-![](man/figures/README-plot-time-pacman-1.png)<!-- -->
+![](man/figures/README-base-grid-pacman-final-1.png)<!-- -->
+
+5.  Draw the ghosts, using the trick that `+` works also on a list of
+    geometries.
+
+<!-- end list -->
 
 ``` r
 p_ghosts <- map(.x = ghosts, .f = function(data) {
@@ -1272,16 +1428,28 @@ p_ghosts <- map(.x = ghosts, .f = function(data) {
     )
   )
 })
+```
+
+``` r
 base_grid + p_ghosts
 ```
 
-![](man/figures/README-plot-time-ghosts-1.png)<!-- -->
+![](man/figures/README-base-grid-ghosts-final-1.png)<!-- -->
+
+6.  Draw everything.
+
+<!-- end list -->
 
 ``` r
 base_grid + p_points + p_pacman + p_ghosts
 ```
 
 ![](man/figures/README-plot-time-all-1.png)<!-- -->
+
+7.  Animate
+everything.
+
+<!-- end list -->
 
 ``` r
 PacMan <- base_grid + p_points + p_pacman + p_ghosts + transition_manual(step)
