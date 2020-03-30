@@ -13,9 +13,8 @@ tag](https://img.shields.io/github/tag/mcanouil/ggpacman.svg?label=latest%20tag)
 status](https://github.com/mcanouil/ggpacman/workflows/R-CMD-check/badge.svg)](https://github.com/mcanouil/ggpacman/actions)
 <!-- badges: end -->
 
-The goal of `ggpacman` is to …  
-Build a GIF of the game Pac-Man (*not to develop an R version of Pac-Man
-…*).
+The goal of `ggpacman` is to … Build a GIF of the game Pac-Man (*not to
+develop an R version of Pac-Man …*).
 
 ## Installation
 
@@ -129,8 +128,7 @@ library("ggtext")
 #### The base layer
 
 First thing first, I needed to set-up the base layer, meaning, the maze
-from Pac-Man.  
-I did start by setting the coordinates of the maze.
+from Pac-Man. I did start by setting the coordinates of the maze.
 
 ``` r
 base_layer <- ggplot() +
@@ -166,21 +164,21 @@ map_colours <- c(
 base_layer <- base_layer +
   scale_size_manual(values = c("wall" = 2.5, "door" = 1, "big" = 2.5, "normal" = 0.5, "eaten" = 3)) +
   scale_fill_manual(breaks = names(map_colours), values = map_colours) +
-  scale_colour_manual(breaks = names(map_colours), values = map_colours) 
+  scale_colour_manual(breaks = names(map_colours), values = map_colours)
 ```
 
 ![](man/figures/README-base-layer-plot-1.png)<!-- -->
 
 My `base_layer` here is not really helpful, so I temporarily added some
-elements to help me draw everything on it.  
-*Note*: I won’t use it in the following.
+elements to help me draw everything on it. *Note*: I won’t use it in the
+following.
 
 ``` r
 base_layer +
   scale_x_continuous(breaks = 0:21, sec.axis = dup_axis()) +
   scale_y_continuous(breaks = 0:26, sec.axis = dup_axis()) +
   theme(
-    panel.grid.major = element_line(colour = "white"), 
+    panel.grid.major = element_line(colour = "white"),
     axis.text = element_text(colour = "white")
   ) +
   annotate("rect", xmin = 0, xmax = 21, ymin = 0, ymax = 26, fill = NA)
@@ -192,9 +190,9 @@ Quite better, isn’t it?\!
 
 #### The grid layer
 
-Here, I am calling “grid”, the walls of the maze.  
-For this grid, I started drawing the vertical lines on the left side of
-the maze (as you may have noticed, the first level is symmetrical).
+Here, I am calling “grid”, the walls of the maze. For this grid, I
+started drawing the vertical lines on the left side of the maze (as you
+may have noticed, the first level is symmetrical).
 
 ``` r
 left_vertical_segments <- tribble(
@@ -222,7 +220,7 @@ left_vertical_segments <- tribble(
 ```
 
 ``` r
-base_layer + 
+base_layer +
   geom_segment(
     data = left_vertical_segments,
     mapping = aes(x = x, y = y, xend = xend, yend = yend),
@@ -272,7 +270,7 @@ left_segments <- bind_rows(left_vertical_segments, left_horizontal_segments)
 ```
 
 ``` r
-base_layer + 
+base_layer +
   geom_segment(
     data = left_segments,
     mapping = aes(x = x, y = y, xend = xend, yend = yend),
@@ -297,7 +295,7 @@ right_segments <-  mutate(
 ```
 
 ``` r
-base_layer + 
+base_layer +
   geom_segment(
     data = bind_rows(left_segments, right_segments),
     mapping = aes(x = x, y = y, xend = xend, yend = yend),
@@ -311,9 +309,8 @@ base_layer +
 
 The middle vertical lines were missing, *i.e.*, I did not want to plot
 them twice, which would have happen, if I added these in
-`left_segments`.  
-Also, the “door” of the ghost spawn area is missing. I added the door
-and the missing vertical walls in the end.
+`left_segments`. Also, the “door” of the ghost spawn area is missing. I
+added the door and the missing vertical walls in the end.
 
 ``` r
 centre_vertical_segments <- tribble(
@@ -339,7 +336,7 @@ maze_walls <- bind_rows(
 ```
 
 ``` r
-base_layer + 
+base_layer +
   geom_segment(
     data = maze_walls,
     mapping = aes(x = x, y = y, xend = xend, yend = yend),
@@ -352,15 +349,14 @@ base_layer +
 ![](man/figures/README-maze-plot-1.png)<!-- -->
 
 The maze is now complete, but no-one can actually see the door, since it
-appears the same way as the walls.  
-You may have noticed, I added a column named `type`.  
-`type` can currently hold two values: `"wall"` and `"door"`.  
-I am going to use `type` as values for two aesthetics, you may already
-have guessed which ones.  
-The answer is the `colour` and `size` aesthetics.
+appears the same way as the walls. You may have noticed, I added a
+column named `type`. `type` can currently hold two values: `"wall"` and
+`"door"`. I am going to use `type` as values for two aesthetics, you may
+already have guessed which ones. The answer is the `colour` and `size`
+aesthetics.
 
 ``` r
-base_layer + 
+base_layer +
   geom_segment(
     data = maze_walls,
     mapping = aes(x = x, y = y, xend = xend, yend = yend, colour = type, size = type),
@@ -415,7 +411,7 @@ maze_points <- bonus_points_coord()
 ```
 
 ``` r
-maze_layer <- base_layer + 
+maze_layer <- base_layer +
   geom_segment(
     data = maze_walls,
     mapping = aes(x = x, y = y, xend = xend, yend = yend, colour = type, size = type),
@@ -464,7 +460,7 @@ things:
     ``` r
     maze_layer +
       geom_point(
-        data = unnest(pacman, c("x", "y")), 
+        data = unnest(pacman, c("x", "y")),
         mapping = aes(x = x, y = y, colour = colour),
         size = 4
       )
@@ -523,10 +519,9 @@ direction of movement🎖
 </blockquote>
 
 Once those things available, how to make Pac-Man look where he is
-headed?  
-Short answer, I just computed the differences between two successive
-positions of Pac-Man and added both open/close state to a new column
-`state`.
+headed? Short answer, I just computed the differences between two
+successive positions of Pac-Man and added both open/close state to a new
+column `state`.
 
 ``` r
 pacman %>%
@@ -594,10 +589,10 @@ maze_layer +
 
 ![](man/figures/README-pacman-moves-plots-1.png)<!-- -->
 
-You can’t see much?\!  
-Ok, perhaps it’s time to use [`gganimate`](https://gganimate.com/).  
-I am going to animate Pac-Man based on the column `step`, which is, if
-you looked at the code above, just the line number of `pacman_moves`.
+You can’t see much?\! Ok, perhaps it’s time to use
+[`gganimate`](https://gganimate.com/). I am going to animate Pac-Man
+based on the column `step`, which is, if you looked at the code above,
+just the line number of `pacman_moves`.
 
 ``` r
 animated_pacman <- maze_layer +
@@ -605,7 +600,7 @@ animated_pacman <- maze_layer +
     data = pacman_moves,
     mapping = aes(x0 = x, y0 = y, r0 = 0, r = 0.5, start = start, end = end, colour = colour, fill = colour, group = step),
     inherit.aes = FALSE
-  ) + 
+  ) +
   transition_manual(step)
 ```
 
@@ -625,14 +620,14 @@ ghost which are half circle (or at least I chose this) and use again
 `geom_arc_bar()`.
 
 ``` r
-ghost_arc <- unnest(tribble(
+ghost_arc <- tribble(
   ~x0, ~y0, ~r, ~start, ~end, ~part,
   0, 0, 0.5, - 1 * pi / 2, 1 * pi / 2, "top",
-  c(-1 / 6, 1 / 6), -0.5 + 1/8, 0.125, pi / 2, 3 * pi / 2, "bottom",
-  -0.5, -0.5 + 1/8, 0.125, 2 * pi / 4, 4 * pi / 4, "bottom",
-  0.5, -0.5 + 1/8, 0.125, - 2 * pi / 4, - 4 * pi / 4, "bottom",
-  c(-1 / 3, 0, 1 / 3), -0.5 + 1/8, 1 / 24, - 1 * pi / 2, 1 * pi / 2, "bottom",
-), "x0")
+  -0.5, -0.5 + 1/6, 1 / 6,  pi / 2, 2 * pi / 2, "bottom",
+  -1/6, -0.5 + 1/6, 1 / 6,  pi / 2, 3 * pi / 2, "bottom",
+  1/6, -0.5 + 1/6, 1 / 6,  pi / 2, 3 * pi / 2, "bottom",
+  0.5, -0.5 + 1/6, 1 / 6,  3 * pi / 2,  2 * pi / 2, "bottom"
+)
 ```
 
 ``` r
@@ -658,11 +653,11 @@ And I proceeded the same way for the bottom part of the ghost.
 ``` r
 bottom <- ggplot() +
   geom_arc_bar(
-    data = ghost_arc[c(5, 3, 2, 4), ],
-    mapping = aes(
+    data = ghost_arc,
+        mapping = aes(
       x0 = x0, y0 = y0,
-      r0 = 0, r = 0.17,
-      start = start, end = end
+      r0 = 0, r = r,
+            start = start, end = end
     )
   ) +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1))
@@ -678,10 +673,19 @@ Then, I just added one point to “properly” link the top and the bottom
 part.
 
 ``` r
-ghost_body <- bind_rows(
-  top_polygon[-nrow(top_polygon), ],
-  tibble(x = 0.5, y = -0.5 + 1/8),
-  bottom_polygon
+ghost_body <- dplyr::bind_rows(
+  top_polygon,
+  dplyr::tribble(
+    ~x, ~y,
+    0.5, 0,
+    0.5, -0.5 + 1/6
+  ),
+  bottom_polygon,
+  dplyr::tribble(
+    ~x, ~y,
+    -0.5, -0.5 + 1/6,
+    -0.5, 0
+  )
 )
 ```
 
@@ -700,15 +704,14 @@ ggplot() +
 ![](man/figures/README-ghost-body-plot-1.png)<!-- -->
 
 *Note: `ghost_body` is a dataset of `ggpacman` (`data("ghost_body",
-package = "ggpacman")`).*  
-*Note: `ghost_body` definitely needs some code refactoring.*
+package = "ggpacman")`).* *Note: `ghost_body` definitely needs some code
+refactoring.*
 
 #### Eyes ([top](#d2-top))
 
-The eyes are quite easy to draw, they are just circles, but …  
-As for Pac-Man before, I wanted the ghosts to look where they are
-headed.  
-This implies moving the iris one way or the other, and so I defined five
+The eyes are quite easy to draw, they are just circles, but … As for
+Pac-Man before, I wanted the ghosts to look where they are headed. This
+implies moving the iris one way or the other, and so I defined five
 states for the iris: right, down, left, up and middle.
 
 ``` r
@@ -814,7 +817,7 @@ position at each actual position of a ghost.
 ``` r
 blinky_ghost <- blinky_ghost %>%
   mutate(state = list(1:4)) %>%
-  unnest("state") %>% 
+  unnest("state") %>%
   mutate(
     step = 1:n(),
     noise_x = rnorm(n(), mean = 0, sd = 0.05),
@@ -825,33 +828,33 @@ blinky_ghost <- blinky_ghost %>%
     #> # A tibble: 20 x 12
     #>        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x
     #>    <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>
-    #>  1     0     0 Blinky     0     0      NA      NA middle        1     1 -4.81e-2
-    #>  2     0     0 Blinky     0     0      NA      NA middle        2     2 -2.97e-2
-    #>  3     0     0 Blinky     0     0      NA      NA middle        3     3 -4.35e-2
-    #>  4     0     0 Blinky     0     0      NA      NA middle        4     4  2.27e-2
-    #>  5     1     0 Blinky     1     0       1       0 right         1     5 -1.21e-2
-    #>  6     1     0 Blinky     1     0       1       0 right         2     6  4.29e-3
-    #>  7     1     0 Blinky     1     0       1       0 right         3     7 -2.91e-2
-    #>  8     1     0 Blinky     1     0       1       0 right         4     8 -1.07e-2
-    #>  9     1     1 Blinky     1     1       0       1 up            1     9  3.05e-2
-    #> 10     1     1 Blinky     1     1       0       1 up            2    10  2.89e-2
-    #> 11     1     1 Blinky     1     1       0       1 up            3    11  3.91e-2
-    #> 12     1     1 Blinky     1     1       0       1 up            4    12  7.48e-3
-    #> 13     0     1 Blinky     0     1      -1       0 left          1    13  6.99e-2
-    #> 14     0     1 Blinky     0     1      -1       0 left          2    14  2.13e-2
-    #> 15     0     1 Blinky     0     1      -1       0 left          3    15  2.66e-3
-    #> 16     0     1 Blinky     0     1      -1       0 left          4    16 -1.19e-2
-    #> 17     0     0 Blinky     0     0       0      -1 down          1    17 -1.85e-3
-    #> 18     0     0 Blinky     0     0       0      -1 down          2    18  1.35e-2
-    #> 19     0     0 Blinky     0     0       0      -1 down          3    19  8.92e-2
-    #> 20     0     0 Blinky     0     0       0      -1 down          4    20  6.73e-4
+    #>  1     0     0 Blinky     0     0      NA      NA middle        1     1 -0.0553 
+    #>  2     0     0 Blinky     0     0      NA      NA middle        2     2  0.0830 
+    #>  3     0     0 Blinky     0     0      NA      NA middle        3     3 -0.00227
+    #>  4     0     0 Blinky     0     0      NA      NA middle        4     4 -0.0578 
+    #>  5     1     0 Blinky     1     0       1       0 right         1     5  0.00517
+    #>  6     1     0 Blinky     1     0       1       0 right         2     6  0.0100 
+    #>  7     1     0 Blinky     1     0       1       0 right         3     7  0.00515
+    #>  8     1     0 Blinky     1     0       1       0 right         4     8  0.117  
+    #>  9     1     1 Blinky     1     1       0       1 up            1     9 -0.0418 
+    #> 10     1     1 Blinky     1     1       0       1 up            2    10 -0.00183
+    #> 11     1     1 Blinky     1     1       0       1 up            3    11  0.00313
+    #> 12     1     1 Blinky     1     1       0       1 up            4    12 -0.00690
+    #> 13     0     1 Blinky     0     1      -1       0 left          1    13  0.0580 
+    #> 14     0     1 Blinky     0     1      -1       0 left          2    14 -0.0125 
+    #> 15     0     1 Blinky     0     1      -1       0 left          3    15 -0.0452 
+    #> 16     0     1 Blinky     0     1      -1       0 left          4    16  0.0361 
+    #> 17     0     0 Blinky     0     0       0      -1 down          1    17  0.0101 
+    #> 18     0     0 Blinky     0     0       0      -1 down          2    18 -0.0245 
+    #> 19     0     0 Blinky     0     0       0      -1 down          3    19  0.00913
+    #> 20     0     0 Blinky     0     0       0      -1 down          4    20  0.0630 
     #> # … with 1 more variable: noise_y <dbl>
 
 Then, I added (*in a weird way I might say*) the polygons coordinates
 for the body and the eyes.
 
 ``` r
-blinky_ghost <- blinky_ghost %>% 
+blinky_ghost <- blinky_ghost %>%
   mutate(
     body = pmap(
       .l = list(x, y, noise_x, noise_y),
@@ -882,26 +885,26 @@ blinky_ghost <- blinky_ghost %>%
     #> # A tibble: 20 x 12
     #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
     #>    <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
-    #>  1 Blinky     0     0      NA      NA middle        1     1 -4.81e-2  2.16e-2
-    #>  2 Blinky     0     0      NA      NA middle        2     2 -2.97e-2  3.57e-2
-    #>  3 Blinky     0     0      NA      NA middle        3     3 -4.35e-2 -8.87e-3
-    #>  4 Blinky     0     0      NA      NA middle        4     4  2.27e-2  4.08e-3
-    #>  5 Blinky     1     0       1       0 right         1     5 -1.21e-2 -8.12e-2
-    #>  6 Blinky     1     0       1       0 right         2     6  4.29e-3  8.64e-3
-    #>  7 Blinky     1     0       1       0 right         3     7 -2.91e-2  4.38e-2
-    #>  8 Blinky     1     0       1       0 right         4     8 -1.07e-2  3.57e-2
-    #>  9 Blinky     1     1       0       1 up            1     9  3.05e-2  4.53e-2
-    #> 10 Blinky     1     1       0       1 up            2    10  2.89e-2 -1.08e-1
-    #> 11 Blinky     1     1       0       1 up            3    11  3.91e-2  9.64e-4
-    #> 12 Blinky     1     1       0       1 up            4    12  7.48e-3 -4.96e-2
-    #> 13 Blinky     0     1      -1       0 left          1    13  6.99e-2 -1.65e-1
-    #> 14 Blinky     0     1      -1       0 left          2    14  2.13e-2 -2.79e-2
-    #> 15 Blinky     0     1      -1       0 left          3    15  2.66e-3  6.91e-3
-    #> 16 Blinky     0     1      -1       0 left          4    16 -1.19e-2  1.13e-1
-    #> 17 Blinky     0     0       0      -1 down          1    17 -1.85e-3  4.05e-2
-    #> 18 Blinky     0     0       0      -1 down          2    18  1.35e-2 -1.91e-2
-    #> 19 Blinky     0     0       0      -1 down          3    19  8.92e-2  5.38e-3
-    #> 20 Blinky     0     0       0      -1 down          4    20  6.73e-4  5.20e-2
+    #>  1 Blinky     0     0      NA      NA middle        1     1 -0.0553  -2.31e-2
+    #>  2 Blinky     0     0      NA      NA middle        2     2  0.0830  -6.22e-3
+    #>  3 Blinky     0     0      NA      NA middle        3     3 -0.00227  3.47e-2
+    #>  4 Blinky     0     0      NA      NA middle        4     4 -0.0578   7.36e-2
+    #>  5 Blinky     1     0       1       0 right         1     5  0.00517  1.67e-2
+    #>  6 Blinky     1     0       1       0 right         2     6  0.0100   6.33e-2
+    #>  7 Blinky     1     0       1       0 right         3     7  0.00515 -1.01e-2
+    #>  8 Blinky     1     0       1       0 right         4     8  0.117   -7.69e-2
+    #>  9 Blinky     1     1       0       1 up            1     9 -0.0418  -4.02e-2
+    #> 10 Blinky     1     1       0       1 up            2    10 -0.00183  8.21e-3
+    #> 11 Blinky     1     1       0       1 up            3    11  0.00313  3.68e-2
+    #> 12 Blinky     1     1       0       1 up            4    12 -0.00690  6.46e-2
+    #> 13 Blinky     0     1      -1       0 left          1    13  0.0580  -3.69e-3
+    #> 14 Blinky     0     1      -1       0 left          2    14 -0.0125   6.44e-2
+    #> 15 Blinky     0     1      -1       0 left          3    15 -0.0452   1.49e-1
+    #> 16 Blinky     0     1      -1       0 left          4    16  0.0361  -7.20e-2
+    #> 17 Blinky     0     0       0      -1 down          1    17  0.0101   6.35e-2
+    #> 18 Blinky     0     0       0      -1 down          2    18 -0.0245  -6.64e-4
+    #> 19 Blinky     0     0       0      -1 down          3    19  0.00913  3.41e-2
+    #> 20 Blinky     0     0       0      -1 down          4    20  0.0630  -9.65e-2
     #> # … with 2 more variables: body <list>, eyes <list>
 
 For ease, it is now a call to one function directly on the poition
@@ -943,12 +946,12 @@ animated_blinky <- blinky_plot + transition_manual(step)
 #### Bonus points ([top](#e1-top))
 
 For ease, I am using some functions I defined to go quickly to the
-results of the first part of this readme.  
-The idea here is to look at all the position in common between Pac-Man
-(`pacman_moves`) and the bonus points (`maze_points`).  
-Each time Pac-Man was at the same place as a bonus point, I defined a
-status `"eaten"` for all values of `step` after.  
-I ended up with a big table with position and the state of the bonus
+results of the first part of this readme. The idea here is to look at
+all the position in common between Pac-Man (`pacman_moves`) and the
+bonus points (`maze_points`). Each time Pac-Man was at the same place as
+a bonus point, I defined a status `"eaten"` for all values of `step`
+after. I ended up with a big table with position and the state of the
+bonus
 points.
 
 ``` r
@@ -990,8 +993,8 @@ bonus points.
 ![](man/figures/README-reminder-maze-1.png)<!-- -->
 
 I could have change this geometry (*i.e.*, `geom_point()`), but I did
-not, and draw a new geometry on top of the previous ones.  
-Do you remember the values of the scale for the size
+not, and draw a new geometry on top of the previous ones. Do you
+remember the values of the scale for the size
 aesthetic?
 
 ``` r
@@ -1111,7 +1114,7 @@ ggpacman::compute_ghost_status
 #>       )
 #>     )
 #> }
-#> <bytecode: 0x55e7cb7c8a30>
+#> <bytecode: 0x55bb2a010510>
 #> <environment: namespace:ggpacman>
 ```
 
@@ -1128,9 +1131,9 @@ ghost_moves <- ggpacman::compute_ghost_status(
   pacman_moves = pacman_moves,
   bonus_points_eaten = bonus_points_eaten
 )
-ghost_moves %>% 
-  filter(state == 1) %>% 
-  distinct(step, direction, colour, vulnerability) %>% 
+ghost_moves %>%
+  filter(state == 1) %>%
+  distinct(step, direction, colour, vulnerability) %>%
   as.data.frame()
 #>    step direction       colour vulnerability
 #> 1     1    middle       Blinky         FALSE
@@ -1225,16 +1228,16 @@ blinky_moves <- ggpacman::compute_ghost_coord(blinky_ghost)
     #> # A tibble: 48 x 12
     #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
     #>    <chr>  <int> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
-    #>  1 Blinky     1     0      NA      NA middle        1     1  0.0168  -0.0167 
-    #>  2 Blinky     1     0      NA      NA middle        2     2  0.0555   0.00955
-    #>  3 Blinky     1     0      NA      NA middle        3     3  0.0376   0.0380 
-    #>  4 Blinky     1     0      NA      NA middle        4     4 -0.0166  -0.0479 
-    #>  5 Blinky     2     0       1       0 right         1     5  0.0489  -0.0368 
-    #>  6 Blinky     2     0       1       0 right         2     6 -0.00463  0.0967 
-    #>  7 Blinky     2     0       1       0 right         3     7 -0.0521  -0.0142 
-    #>  8 Blinky     2     0       1       0 right         4     8  0.0431  -0.0210 
-    #>  9 Blinky     3     0       1       0 right         1     9  0.0165   0.0345 
-    #> 10 Blinky     3     0       1       0 right         2    10 -0.0382  -0.0180 
+    #>  1 Blinky     1     0      NA      NA middle        1     1  0.0637   0.0531 
+    #>  2 Blinky     1     0      NA      NA middle        2     2 -0.0140   0.0565 
+    #>  3 Blinky     1     0      NA      NA middle        3     3 -0.0127  -0.0611 
+    #>  4 Blinky     1     0      NA      NA middle        4     4  0.0367  -0.0353 
+    #>  5 Blinky     2     0       1       0 right         1     5 -0.0401  -0.0362 
+    #>  6 Blinky     2     0       1       0 right         2     6 -0.124    0.0298 
+    #>  7 Blinky     2     0       1       0 right         3     7 -0.0431   0.0712 
+    #>  8 Blinky     2     0       1       0 right         4     8  0.0217   0.0184 
+    #>  9 Blinky     3     0       1       0 right         1     9  0.00219 -0.00393
+    #> 10 Blinky     3     0       1       0 right         2    10  0.0269   0.0474 
     #> # … with 38 more rows, and 2 more variables: body <list>, eyes <list>
 
 ``` r
@@ -1311,7 +1314,7 @@ map_colours <- c(
 <!-- end list -->
 
 ``` r
-base_grid <- ggplot() + 
+base_grid <- ggplot() +
   theme_void() +
   theme(
     legend.position = "none",
@@ -1461,12 +1464,11 @@ PacMan <- base_grid + p_points + p_pacman + p_ghosts + transition_manual(step)
 ## Getting help
 
 If you encounter a clear bug, please file a minimal reproducible example
-on [github](https://github.com/mcanouil/ggpacman/issues).  
-For questions and other discussion, please contact the package
-maintainer.
+on [github](https://github.com/mcanouil/ggpacman/issues). For questions
+and other discussion, please contact the package maintainer.
 
 -----
 
 Please note that this project is released with a [Contributor Code of
-Conduct](https://github.com/mcanouil/ggpacman/blob/master/.github/CODE_OF_CONDUCT.md).  
-By participating in this project you agree to abide by its terms.
+Conduct](https://github.com/mcanouil/ggpacman/blob/master/.github/CODE_OF_CONDUCT.md).
+participating in this project you agree to abide by its terms.

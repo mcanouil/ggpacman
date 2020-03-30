@@ -1,12 +1,12 @@
 #' Ghost Body
-ghost_arc <- tidyr::unnest(dplyr::tribble(
+ghost_arc <- dplyr::tribble(
   ~x0, ~y0, ~r, ~start, ~end, ~part,
   0, 0, 0.5, - 1 * pi / 2, 1 * pi / 2, "top",
-  c(-1 / 6, 1 / 6), -0.5 + 1/8, 0.125, pi / 2, 3 * pi / 2, "bottom",
-  -0.5, -0.5 + 1/8, 0.125, 2 * pi / 4, 4 * pi / 4, "bottom",
-  0.5, -0.5 + 1/8, 0.125, - 2 * pi / 4, - 4 * pi / 4, "bottom",
-  c(-1 / 3, 0, 1 / 3), -0.5 + 1/8, 1 / 24, - 1 * pi / 2, 1 * pi / 2, "bottom",
-), "x0")
+  -0.5, -0.5 + 1/6, 1 / 6,  pi / 2, 2 * pi / 2, "bottom",
+  -1/6, -0.5 + 1/6, 1 / 6,  pi / 2, 3 * pi / 2, "bottom",
+  1/6, -0.5 + 1/6, 1 / 6,  pi / 2, 3 * pi / 2, "bottom",
+  0.5, -0.5 + 1/6, 1 / 6,  3 * pi / 2,  2 * pi / 2, "bottom"
+)
 
 top <- ggplot2::ggplot() +
   ggforce::geom_arc_bar(
@@ -35,9 +35,18 @@ bottom <- ggplot2::ggplot() +
 bottom_polygon <- ggplot2::ggplot_build(bottom)$data[[1]][, c("x", "y")]
 
 ghost_body <- dplyr::bind_rows(
-  top_polygon[-nrow(top_polygon), ],
-  dplyr::tibble(x = 0.5, y = -0.5 + 1/8),
-  bottom_polygon
+  top_polygon,
+  dplyr::tribble(
+    ~x, ~y,
+    0.5, 0,
+    0.5, -0.5 + 1/6
+  ),
+  bottom_polygon,
+  dplyr::tribble(
+    ~x, ~y,
+    -0.5, -0.5 + 1/6,
+    -0.5, 0
+  )
 )
 
 #' Ghost Eyes
@@ -60,3 +69,19 @@ ghost_eyes <- dplyr::tribble(
 
 #' use_data()
 usethis::use_data(ghost_body, ghost_eyes, overwrite = TRUE)
+
+
+# ggplot() +
+#   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1)) +
+#   geom_polygon(
+#     data = ghost_body,
+#     mapping = aes(x = x, y = y),
+#     inherit.aes = FALSE
+#   ) +
+#   geom_circle(
+#     data = ghost_eyes,
+#     mapping = aes(x0 = x0, y0 = y0, r = r, colour = part, fill = part),
+#     inherit.aes = FALSE,
+#     show.legend = FALSE
+#   ) +
+#   facet_wrap(vars(direction), ncol = 3)
