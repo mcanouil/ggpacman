@@ -23,10 +23,10 @@ top_polygon <- ggplot2::ggplot_build(top)$data[[1]][, c("x", "y")]
 
 bottom <- ggplot2::ggplot() +
   ggforce::geom_arc_bar(
-    data = ghost_arc[c(5, 3, 2, 4), ],
+    data = ghost_arc[-1, ],
     mapping = ggplot2::aes(
       x0 = .data[["x0"]], y0 = .data[["y0"]],
-      r0 = 0, r = 0.17,
+      r0 = 0, r = .data[["r"]],
       start = .data[["start"]], end = .data[["end"]]
     )
   ) +
