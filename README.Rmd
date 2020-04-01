@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# A `ggplot2` and `gganimate` Version of Pac-Man
+# A `ggplot2` and `gganimate` Version of Pac-Man <img src="man/figures/ggpacman.gif" align="right" width="120" />
 
 <!-- badges: start -->
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
