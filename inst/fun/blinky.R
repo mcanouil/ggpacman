@@ -84,8 +84,8 @@ ghost <- full_join(
 ) %>%
   arrange(step) %>%
   mutate(
-    x_noise = map2(step, state=="crazy", ~rnorm(5 * (.y + 1), 0, 0.01)),
-    y_noise = map2(step, state=="crazy", ~rnorm(5 * (.y + 1), 0, 0.01))
+    x_noise = map2(step, state!="crazy", ~rnorm(5 * (.y + 1), 0, 0.01)),
+    y_noise = map2(step, state!="crazy", ~rnorm(5 * (.y + 1), 0, 0.01))
   ) %>%
   unnest(c("x_noise", "y_noise")) %>%
   mutate(
@@ -160,16 +160,15 @@ p <- ggplot() +
   geom_text(
     mapping = aes(x = 0, y = -6/10, label = "ggpacman"),
     size = 6, family = "xkcd", colour = "goldenrod1"
-  ) +
-  transition_manual(step)
+  )
 
 animate(
-  plot = p,
+  plot = p + transition_manual(step),
   width = 4.39,
   height = 5.08,
   units = "cm",
   res = 600,
   bg = "transparent",
   duration = 5,
-  renderer = gifski_renderer(file = "man/figures/ggpacman.gif")
+  renderer = gifski_renderer(file = here::here("man", "figures", "ggpacman.gif"))
 )
