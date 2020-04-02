@@ -168,7 +168,7 @@ animate(
   width = 4.39,
   height = 5.08,
   units = "cm",
-  res = 120,
+  res = 600,
   bg = "transparent",
   duration = 5,
   renderer = gifski_renderer(file = "man/figures/ggpacman.gif")
