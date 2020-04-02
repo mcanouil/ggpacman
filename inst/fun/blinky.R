@@ -167,7 +167,7 @@ animate(
   width = 4.39,
   height = 5.08,
   units = "cm",
-  res = 600,
+  res = 200,
   bg = "transparent",
   duration = 5,
   renderer = gifski_renderer(file = here::here("man", "figures", "ggpacman.gif"))
