@@ -23,6 +23,7 @@ knitr::opts_chunk$set(
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![GitHub tag](https://img.shields.io/github/tag/mcanouil/ggpacman.svg?label=latest tag)](https://github.com/mcanouil/ggpacman)
 [![R build status](https://github.com/mcanouil/ggpacman/workflows/R-CMD-check/badge.svg)](https://github.com/mcanouil/ggpacman/actions)
+[![CRAN status](https://www.r-pkg.org/badges/version/ggpacman)](https://CRAN.R-project.org/package=ggpacman)
 <!-- badges: end -->
 
 The goal of `ggpacman` is to ...
@@ -79,7 +80,7 @@ But, I am going to go through my code here (you might be interested to actually 
     3. [Ghost shape](#ghost-shape)
 5. [How Pac-Man interacts with the maze?](#how-pac-man-interacts-with-the-maze)
     1. [Bonus points](#bonus-points)
-    2. [Ghost `"weak"` and `"eaten"` states](#ghost-weak-and-eaten-states-top)
+    2. [Ghost `"weak"` and `"eaten"` states](#ghost-weak-and-eaten-states)
 6. [Plot time](#plot-time)
 
 ### The packages
@@ -502,7 +503,7 @@ animate(
 
 Time to draw the ghosts, namely: Blinky, Pinky, Inky and Clyde.
 
-#### Body ([top](#d1-top))
+#### Body
 
 I started with the body, especially the top and the bottom part of the ghost which are half circle (or at least I chose this) and use again `geom_arc_bar()`.
 
@@ -588,7 +589,7 @@ ggplot() +
 *Note: `ghost_body` is a dataset of `ggpacman` (`data("ghost_body", package = "ggpacman")`).*
 *Note: `ghost_body` definitely needs some code refactoring.*
 
-#### Eyes ([top](#d2-top))
+#### Eyes
 
 The eyes are quite easy to draw, they are just circles, but ...
 As for Pac-Man before, I wanted the ghosts to look where they are headed.
@@ -630,7 +631,7 @@ ggplot() +
 
 *Note: `ghost_eyes` is a dataset of `ggpacman` (`data("ghost_eyes", package = "ggpacman")`).*
 
-#### Ghost shape ([top](#d3-top))
+#### Ghost shape
 
 I had the whole ghost shape and the eyes.
 
@@ -775,9 +776,9 @@ animate(
 )
 ```
 
-### How Pac-Man interacts with the maze? ([top](#e-top))
+### How Pac-Man interacts with the maze?
 
-#### Bonus points ([top](#e1-top))
+#### Bonus points
 
 For ease, I am using some functions I defined to go quickly to the results of the first part of this readme.
 The idea here is to look at all the position in common between Pac-Man (`pacman_moves`) and the bonus points (`maze_points`).
@@ -848,7 +849,7 @@ animate(
 ```
 
 
-#### Ghost `"weak"` and `"eaten"` states ([top](#e2-top))
+#### Ghost `"weak"` and `"eaten"` states
 
 The ghosts were more tricky (I know, they are ghosts ...).
 

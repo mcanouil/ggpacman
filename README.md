@@ -11,6 +11,8 @@ maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www
 tag](https://img.shields.io/github/tag/mcanouil/ggpacman.svg?label=latest%20tag)](https://github.com/mcanouil/ggpacman)
 [![R build
 status](https://github.com/mcanouil/ggpacman/workflows/R-CMD-check/badge.svg)](https://github.com/mcanouil/ggpacman/actions)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/ggpacman)](https://CRAN.R-project.org/package=ggpacman)
 <!-- badges: end -->
 
 The goal of `ggpacman` is to … Build a GIF of the game Pac-Man (*not to
@@ -104,7 +106,7 @@ and
     maze?](#how-pac-man-interacts-with-the-maze)
     1.  [Bonus points](#bonus-points)
     2.  [Ghost `"weak"` and `"eaten"`
-        states](#ghost-weak-and-eaten-states-top)
+        states](#ghost-weak-and-eaten-states)
 6.  [Plot time](#plot-time)
 
 ### The packages
@@ -613,7 +615,7 @@ animated_pacman <- maze_layer +
 
 Time to draw the ghosts, namely: Blinky, Pinky, Inky and Clyde.
 
-#### Body ([top](#d1-top))
+#### Body
 
 I started with the body, especially the top and the bottom part of the
 ghost which are half circle (or at least I chose this) and use again
@@ -703,7 +705,7 @@ ggplot() +
 package = "ggpacman")`).* *Note: `ghost_body` definitely needs some code
 refactoring.*
 
-#### Eyes ([top](#d2-top))
+#### Eyes
 
 The eyes are quite easy to draw, they are just circles, but … As for
 Pac-Man before, I wanted the ghosts to look where they are headed. This
@@ -749,7 +751,7 @@ ggplot() +
 *Note: `ghost_eyes` is a dataset of `ggpacman` (`data("ghost_eyes",
 package = "ggpacman")`).*
 
-#### Ghost shape ([top](#d3-top))
+#### Ghost shape
 
 I had the whole ghost shape and the eyes.
 
@@ -824,26 +826,26 @@ blinky_ghost <- blinky_ghost %>%
     #> # A tibble: 20 x 12
     #>        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x
     #>    <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>
-    #>  1     0     0 Blinky     0     0      NA      NA middle        1     1  0.0688 
-    #>  2     0     0 Blinky     0     0      NA      NA middle        2     2  0.0724 
-    #>  3     0     0 Blinky     0     0      NA      NA middle        3     3 -0.0459 
-    #>  4     0     0 Blinky     0     0      NA      NA middle        4     4  0.0208 
-    #>  5     1     0 Blinky     1     0       1       0 right         1     5 -0.0485 
-    #>  6     1     0 Blinky     1     0       1       0 right         2     6 -0.0399 
-    #>  7     1     0 Blinky     1     0       1       0 right         3     7 -0.0502 
-    #>  8     1     0 Blinky     1     0       1       0 right         4     8 -0.0111 
-    #>  9     1     1 Blinky     1     1       0       1 up            1     9 -0.0341 
-    #> 10     1     1 Blinky     1     1       0       1 up            2    10  0.00276
-    #> 11     1     1 Blinky     1     1       0       1 up            3    11  0.0123 
-    #> 12     1     1 Blinky     1     1       0       1 up            4    12 -0.0152 
-    #> 13     0     1 Blinky     0     1      -1       0 left          1    13  0.0108 
-    #> 14     0     1 Blinky     0     1      -1       0 left          2    14 -0.0305 
-    #> 15     0     1 Blinky     0     1      -1       0 left          3    15 -0.0211 
-    #> 16     0     1 Blinky     0     1      -1       0 left          4    16  0.00870
-    #> 17     0     0 Blinky     0     0       0      -1 down          1    17  0.0271 
-    #> 18     0     0 Blinky     0     0       0      -1 down          2    18 -0.0322 
-    #> 19     0     0 Blinky     0     0       0      -1 down          3    19 -0.0127 
-    #> 20     0     0 Blinky     0     0       0      -1 down          4    20 -0.00227
+    #>  1     0     0 Blinky     0     0      NA      NA middle        1     1 -0.0457 
+    #>  2     0     0 Blinky     0     0      NA      NA middle        2     2  0.0579 
+    #>  3     0     0 Blinky     0     0      NA      NA middle        3     3  0.0135 
+    #>  4     0     0 Blinky     0     0      NA      NA middle        4     4  0.0678 
+    #>  5     1     0 Blinky     1     0       1       0 right         1     5  0.0120 
+    #>  6     1     0 Blinky     1     0       1       0 right         2     6 -0.0522 
+    #>  7     1     0 Blinky     1     0       1       0 right         3     7  0.0205 
+    #>  8     1     0 Blinky     1     0       1       0 right         4     8  0.0441 
+    #>  9     1     1 Blinky     1     1       0       1 up            1     9  0.0225 
+    #> 10     1     1 Blinky     1     1       0       1 up            2    10  0.0519 
+    #> 11     1     1 Blinky     1     1       0       1 up            3    11  0.0332 
+    #> 12     1     1 Blinky     1     1       0       1 up            4    12 -0.00327
+    #> 13     0     1 Blinky     0     1      -1       0 left          1    13 -0.0433 
+    #> 14     0     1 Blinky     0     1      -1       0 left          2    14  0.0223 
+    #> 15     0     1 Blinky     0     1      -1       0 left          3    15  0.0315 
+    #> 16     0     1 Blinky     0     1      -1       0 left          4    16  0.0560 
+    #> 17     0     0 Blinky     0     0       0      -1 down          1    17  0.00483
+    #> 18     0     0 Blinky     0     0       0      -1 down          2    18 -0.0518 
+    #> 19     0     0 Blinky     0     0       0      -1 down          3    19  0.112  
+    #> 20     0     0 Blinky     0     0       0      -1 down          4    20 -0.0781 
     #> # … with 1 more variable: noise_y <dbl>
 
 Then, I added (*in a weird way I might say*) the polygons coordinates
@@ -881,26 +883,26 @@ blinky_ghost <- blinky_ghost %>%
     #> # A tibble: 20 x 12
     #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
     #>    <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
-    #>  1 Blinky     0     0      NA      NA middle        1     1  0.0688  -0.0509 
-    #>  2 Blinky     0     0      NA      NA middle        2     2  0.0724  -0.0359 
-    #>  3 Blinky     0     0      NA      NA middle        3     3 -0.0459   0.0243 
-    #>  4 Blinky     0     0      NA      NA middle        4     4  0.0208   0.0137 
-    #>  5 Blinky     1     0       1       0 right         1     5 -0.0485   0.0111 
-    #>  6 Blinky     1     0       1       0 right         2     6 -0.0399  -0.0595 
-    #>  7 Blinky     1     0       1       0 right         3     7 -0.0502  -0.0209 
-    #>  8 Blinky     1     0       1       0 right         4     8 -0.0111  -0.0334 
-    #>  9 Blinky     1     1       0       1 up            1     9 -0.0341  -0.104  
-    #> 10 Blinky     1     1       0       1 up            2    10  0.00276  0.0169 
-    #> 11 Blinky     1     1       0       1 up            3    11  0.0123  -0.0927 
-    #> 12 Blinky     1     1       0       1 up            4    12 -0.0152   0.0636 
-    #> 13 Blinky     0     1      -1       0 left          1    13  0.0108  -0.0241 
-    #> 14 Blinky     0     1      -1       0 left          2    14 -0.0305  -0.0862 
-    #> 15 Blinky     0     1      -1       0 left          3    15 -0.0211  -0.0289 
-    #> 16 Blinky     0     1      -1       0 left          4    16  0.00870  0.0120 
-    #> 17 Blinky     0     0       0      -1 down          1    17  0.0271   0.0111 
-    #> 18 Blinky     0     0       0      -1 down          2    18 -0.0322   0.00909
-    #> 19 Blinky     0     0       0      -1 down          3    19 -0.0127  -0.0821 
-    #> 20 Blinky     0     0       0      -1 down          4    20 -0.00227  0.0178 
+    #>  1 Blinky     0     0      NA      NA middle        1     1 -0.0457   0.0122 
+    #>  2 Blinky     0     0      NA      NA middle        2     2  0.0579   0.0473 
+    #>  3 Blinky     0     0      NA      NA middle        3     3  0.0135   0.0276 
+    #>  4 Blinky     0     0      NA      NA middle        4     4  0.0678  -0.0592 
+    #>  5 Blinky     1     0       1       0 right         1     5  0.0120   0.0711 
+    #>  6 Blinky     1     0       1       0 right         2     6 -0.0522  -0.0808 
+    #>  7 Blinky     1     0       1       0 right         3     7  0.0205  -0.0403 
+    #>  8 Blinky     1     0       1       0 right         4     8  0.0441   0.0166 
+    #>  9 Blinky     1     1       0       1 up            1     9  0.0225   0.0447 
+    #> 10 Blinky     1     1       0       1 up            2    10  0.0519  -0.0401 
+    #> 11 Blinky     1     1       0       1 up            3    11  0.0332  -0.00746
+    #> 12 Blinky     1     1       0       1 up            4    12 -0.00327 -0.0514 
+    #> 13 Blinky     0     1      -1       0 left          1    13 -0.0433   0.0264 
+    #> 14 Blinky     0     1      -1       0 left          2    14  0.0223  -0.0775 
+    #> 15 Blinky     0     1      -1       0 left          3    15  0.0315   0.0169 
+    #> 16 Blinky     0     1      -1       0 left          4    16  0.0560   0.0372 
+    #> 17 Blinky     0     0       0      -1 down          1    17  0.00483 -0.0239 
+    #> 18 Blinky     0     0       0      -1 down          2    18 -0.0518   0.0278 
+    #> 19 Blinky     0     0       0      -1 down          3    19  0.112    0.0211 
+    #> 20 Blinky     0     0       0      -1 down          4    20 -0.0781   0.0197 
     #> # … with 2 more variables: body <list>, eyes <list>
 
 For ease, it is now a call to one function directly on the poition
@@ -937,9 +939,9 @@ animated_blinky <- blinky_plot + transition_manual(step)
 
 ![](man/figures/README-blinky-plot-animated-1.gif)<!-- -->
 
-### How Pac-Man interacts with the maze? ([top](#e-top))
+### How Pac-Man interacts with the maze?
 
-#### Bonus points ([top](#e1-top))
+#### Bonus points
 
 For ease, I am using some functions I defined to go quickly to the
 results of the first part of this readme. The idea here is to look at
@@ -1017,7 +1019,7 @@ animated_points <- maze_layer_points + transition_manual(step)
 
 ![](man/figures/README-points-eaten-plot-animated-1.gif)<!-- -->
 
-#### Ghost `"weak"` and `"eaten"` states ([top](#e2-top))
+#### Ghost `"weak"` and `"eaten"` states
 
 The ghosts were more tricky (I know, they are ghosts …).
 
@@ -1058,59 +1060,39 @@ This is part of a bigger function (I won’t dive too deep into it).
 
 ``` r
 ggpacman::compute_ghost_status
-#> function(ghost, pacman_moves, bonus_points_eaten) {
-#>   ghosts_vulnerability <- bonus_points_eaten %>%
-#>     dplyr::filter(.data[["type"]] == "big") %>%
-#>     dplyr::group_by(.data[["x"]], .data[["y"]]) %>%
-#>     dplyr::summarise(step_init = min(.data[["step"]])) %>%
-#>     dplyr::ungroup() %>%
-#>     dplyr::mutate(
-#>       step = purrr::map(.data[["step_init"]], ~ seq(.x, .x + 30, 1)),
-#>       vulnerability = TRUE,
-#>       x = NULL,
-#>       y = NULL
-#>     ) %>%
-#>     tidyr::unnest("step")
-#> 
-#>   ghost_out <- dplyr::left_join(
-#>     x = compute_ghost_coord(ghost),
-#>     y = pacman_moves %>%
-#>       dplyr::mutate(ghost_eaten = TRUE) %>%
-#>       dplyr::select(c("X0" = "x", "Y0" = "y", "step", "ghost_eaten")),
-#>     by = c("X0", "Y0", "step")
-#>   ) %>%
-#>     dplyr::left_join(y = ghosts_vulnerability, by = "step") %>%
-#>     dplyr::mutate(
-#>       vulnerability = tidyr::replace_na(.data[["vulnerability"]], FALSE),
-#>       ghost_name = .data[["colour"]],
-#>       ghost_eaten = .data[["ghost_eaten"]] & .data[["vulnerability"]],
-#>       colour = ifelse(.data[["vulnerability"]], paste0(.data[["ghost_name"]], "_weak"), .data[["colour"]])
-#>     )
-#> 
-#>   pos_eaten_start <- which(ghost_out[["ghost_eaten"]])
-#>   ghosts_home <- which(ghost_out[["X0"]] == 10 & ghost_out[["Y0"]] == 14)
-#>   for (ipos in pos_eaten_start) {
-#>     pos_eaten_end <- min(ghosts_home[ghosts_home>=ipos])
-#>     ghost_out[["colour"]][ipos:pos_eaten_end] <- paste0(unique(ghost_out[["ghost_name"]]), "_eaten")
-#>   }
-#> 
-#>   dplyr::left_join(
-#>     x = ghost_out,
-#>     y = ghost_out %>%
-#>       dplyr::filter(.data[["step"]] == .data[["step_init"]] & grepl("eaten", .data[["colour"]])) %>%
-#>       dplyr::mutate(already_eaten = TRUE) %>%
-#>       dplyr::select(c("step_init", "already_eaten")),
-#>       by = "step_init"
-#>   ) %>%
-#>     dplyr::mutate(
-#>       colour = dplyr::case_when(
-#>         .data[["already_eaten"]] & .data[["X0"]] == 10 & .data[["Y0"]] == 14 ~ paste0(.data[["ghost_name"]], "_eaten"),
-#>         grepl("weak", .data[["colour"]]) & .data[["already_eaten"]] ~ .data[["ghost_name"]],
-#>         TRUE ~ .data[["colour"]]
-#>       )
-#>     )
+#> function (ghost, pacman_moves, bonus_points_eaten) 
+#> {
+#>     ghosts_vulnerability <- bonus_points_eaten %>% dplyr::filter(.data[["type"]] == 
+#>         "big") %>% dplyr::group_by(.data[["x"]], .data[["y"]]) %>% 
+#>         dplyr::summarise(step_init = min(.data[["step"]])) %>% 
+#>         dplyr::ungroup() %>% dplyr::mutate(step = purrr::map(.data[["step_init"]], 
+#>         ~seq(.x, .x + 30, 1)), vulnerability = TRUE, x = NULL, 
+#>         y = NULL) %>% tidyr::unnest("step")
+#>     ghost_out <- dplyr::left_join(x = compute_ghost_coord(ghost), 
+#>         y = pacman_moves %>% dplyr::mutate(ghost_eaten = TRUE) %>% 
+#>             dplyr::select(c(X0 = "x", Y0 = "y", "step", "ghost_eaten")), 
+#>         by = c("X0", "Y0", "step")) %>% dplyr::left_join(y = ghosts_vulnerability, 
+#>         by = "step") %>% dplyr::mutate(vulnerability = tidyr::replace_na(.data[["vulnerability"]], 
+#>         FALSE), ghost_name = .data[["colour"]], ghost_eaten = .data[["ghost_eaten"]] & 
+#>         .data[["vulnerability"]], colour = ifelse(.data[["vulnerability"]], 
+#>         paste0(.data[["ghost_name"]], "_weak"), .data[["colour"]]))
+#>     pos_eaten_start <- which(ghost_out[["ghost_eaten"]])
+#>     ghosts_home <- which(ghost_out[["X0"]] == 10 & ghost_out[["Y0"]] == 
+#>         14)
+#>     for (ipos in pos_eaten_start) {
+#>         pos_eaten_end <- min(ghosts_home[ghosts_home >= ipos])
+#>         ghost_out[["colour"]][ipos:pos_eaten_end] <- paste0(unique(ghost_out[["ghost_name"]]), 
+#>             "_eaten")
+#>     }
+#>     dplyr::left_join(x = ghost_out, y = ghost_out %>% dplyr::filter(.data[["step"]] == 
+#>         .data[["step_init"]] & grepl("eaten", .data[["colour"]])) %>% 
+#>         dplyr::mutate(already_eaten = TRUE) %>% dplyr::select(c("step_init", 
+#>         "already_eaten")), by = "step_init") %>% dplyr::mutate(colour = dplyr::case_when(.data[["already_eaten"]] & 
+#>         .data[["X0"]] == 10 & .data[["Y0"]] == 14 ~ paste0(.data[["ghost_name"]], 
+#>         "_eaten"), grepl("weak", .data[["colour"]]) & .data[["already_eaten"]] ~ 
+#>         .data[["ghost_name"]], TRUE ~ .data[["colour"]]))
 #> }
-#> <bytecode: 0x55b4b26bfb18>
+#> <bytecode: 0x55af052aff68>
 #> <environment: namespace:ggpacman>
 ```
 
@@ -1222,18 +1204,18 @@ blinky_moves <- ggpacman::compute_ghost_coord(blinky_ghost)
 ```
 
     #> # A tibble: 48 x 12
-    #>    colour    X0    Y0 state_x state_y direction state  step noise_x noise_y
-    #>    <chr>  <int> <dbl>   <dbl>   <dbl> <chr>     <int> <int>   <dbl>   <dbl>
-    #>  1 Blinky     1     0      NA      NA middle        1     1 -0.0515  0.0478
-    #>  2 Blinky     1     0      NA      NA middle        2     2 -0.156   0.0155
-    #>  3 Blinky     1     0      NA      NA middle        3     3 -0.0538  0.0760
-    #>  4 Blinky     1     0      NA      NA middle        4     4  0.121  -0.101 
-    #>  5 Blinky     2     0       1       0 right         1     5  0.0569 -0.0339
-    #>  6 Blinky     2     0       1       0 right         2     6  0.0246 -0.0467
-    #>  7 Blinky     2     0       1       0 right         3     7 -0.0223 -0.0491
-    #>  8 Blinky     2     0       1       0 right         4     8 -0.0276 -0.0130
-    #>  9 Blinky     3     0       1       0 right         1     9 -0.0291  0.0499
-    #> 10 Blinky     3     0       1       0 right         2    10  0.0704 -0.0383
+    #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
+    #>    <chr>  <int> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
+    #>  1 Blinky     1     0      NA      NA middle        1     1 -8.39e-2  0.0693 
+    #>  2 Blinky     1     0      NA      NA middle        2     2  8.05e-2 -0.0407 
+    #>  3 Blinky     1     0      NA      NA middle        3     3  8.01e-4  0.0622 
+    #>  4 Blinky     1     0      NA      NA middle        4     4  2.88e-2 -0.0288 
+    #>  5 Blinky     2     0       1       0 right         1     5 -2.80e-2 -0.0103 
+    #>  6 Blinky     2     0       1       0 right         2     6  3.66e-2  0.0364 
+    #>  7 Blinky     2     0       1       0 right         3     7  7.03e-2 -0.0227 
+    #>  8 Blinky     2     0       1       0 right         4     8 -2.27e-2 -0.00381
+    #>  9 Blinky     3     0       1       0 right         1     9  5.47e-2  0.0296 
+    #> 10 Blinky     3     0       1       0 right         2    10 -3.53e-2  0.0881 
     #> # … with 38 more rows, and 2 more variables: body <list>, eyes <list>
 
 ``` r
