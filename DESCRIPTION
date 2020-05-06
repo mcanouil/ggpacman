@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "***REMOVED***",
            comment = c(ORCID = "0000-0002-3396-4549"))
-Description: This package is a funny code challenge to reproduce the game Pac-Man using 'ggplot2' and 'gganimate'.
+Description: A funny coding challenge to reproduce the game Pac-Man using 'ggplot2' and 'gganimate'.
 License: GPL-3
 URL: https://github.com/mcanouil/pacman
 BugReports: https://github.com/mcanouil/pacman/issues
