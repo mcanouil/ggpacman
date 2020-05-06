@@ -8,13 +8,23 @@
 #'
 #' @return  Returns a `gif_image` object. See `gganimate::gifski_renderer`.
 #' @export
+#'
+#' @examples
+#'
+#' library(ggpacman)
+#' if (interactive()) {
+#'   animate_pacman(pacman = pacman, ghosts = list(blinky, pinky, inky, clyde))
+#' }
+#'
 animate_pacman <- function(
   pacman,
   ghosts,
   file = NULL,
-  caption = "&copy; Micka&euml;l '<i style='color:#21908CFF;'>Coeos</i>' Canouil",
+  caption = iconv("\u00a9 Micka\u00ebl 'Coeos' Canouil", "UTF-8"),
   font_family = ""
 ) {
+  # "&copy; Micka&euml;l '<i style='color:#21908CFF;'>Coeos</i>' Canouil"
+
   ## Setup data and variables ----------------------------------------------------------------------
   pacman_moves <- compute_pacman_coord(pacman)
   bonus_points_eaten <- compute_points_eaten(get(utils::data("maze_points")), pacman_moves)
@@ -35,7 +45,8 @@ animate_pacman <- function(
     ggplot2::theme_void(base_family = font_family) +
     ggplot2::theme(
       legend.position = "none",
-      plot.caption = ggtext::element_textbox_simple(halign = 0.5, colour = "white"),
+      # plot.caption = ggtext::element_textbox_simple(halign = 0.5, colour = "white"),
+      plot.caption = ggplot2::element_text(hjust = 0.5, colour = "white"),
       plot.caption.position = "plot",
       plot.background = ggplot2::element_rect(fill = "black", colour = "black"),
       panel.background = ggplot2::element_rect(fill = "black", colour = "black")

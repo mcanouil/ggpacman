@@ -1,5 +1,5 @@
 Package: ggpacman
-Title: A `ggplot2` and `gganimate` Version of Pac-Man
+Title: A 'ggplot2' and 'gganimate' Version of Pac-Man
 Version: 0.1.0
 Authors@R: 
     person(given = "Mickaël",
@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "***REMOVED***",
            comment = c(ORCID = "0000-0002-3396-4549"))
-Description: `ggpacman` is a funny code challenge to reproduce the game Pac-Man using `ggplot2` and `gganimate`.
+Description: This package is a funny code challenge to reproduce the game Pac-Man using 'ggplot2' and 'gganimate'.
 License: GPL-3
 URL: https://github.com/mcanouil/pacman
 BugReports: https://github.com/mcanouil/pacman/issues
@@ -22,14 +22,13 @@ Imports:
     purrr (>= 0.3.3),
     ggplot2 (>= 3.3.0),
     ggforce (>= 0.3.1),
-    gganimate (>= 1.0.5),
-    ggtext (>= 0.1.0)
-Remotes: github::wilkelab/ggtext
+    gganimate (>= 1.0.5)
+Suggests: 
+    roxygen2 (>= 7.1.0)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
-Suggests: roxygen2 (>= 7.1.0)
 Collate: 
     'pacman-package.R'
     'compute_points_eaten.R'

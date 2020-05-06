@@ -8,7 +8,7 @@ animate_pacman(
   pacman,
   ghosts,
   file = NULL,
-  caption = "&copy; Micka&euml;l '<i style='color:#21908CFF;'>Coeos</i>' Canouil",
+  caption = iconv("© Mickaël 'Coeos' Canouil", "UTF-8"),
   font_family = ""
 )
 }
@@ -28,4 +28,12 @@ Returns a \code{gif_image} object. See \code{gganimate::gifski_renderer}.
 }
 \description{
 Create a Pac-Man Game GIF
+}
+\examples{
+
+library(ggpacman)
+if (interactive()) {
+  animate_pacman(pacman = pacman, ghosts = list(blinky, pinky, inky, clyde))
+}
+
 }
