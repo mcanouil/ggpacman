@@ -6,7 +6,7 @@
 \alias{ggpacman-package}
 \title{ggpacman: A 'ggplot2' and 'gganimate' Version of Pac-Man}
 \description{
-This package is a funny code challenge to reproduce the game Pac-Man using 'ggplot2' and 'gganimate'.
+A funny coding challenge to reproduce the game Pac-Man using 'ggplot2' and 'gganimate'.
 }
 \seealso{
 Useful links:
