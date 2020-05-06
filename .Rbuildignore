@@ -5,3 +5,5 @@
 ^figures$
 ^data-raw$
 ^\.github$
+^cran-comments\.md$
+^LICENSE\.md$
