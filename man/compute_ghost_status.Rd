@@ -13,6 +13,9 @@ compute_ghost_status(ghost, pacman_moves, bonus_points_eaten)
 
 \item{bonus_points_eaten}{Computed datga for points eaten by Pac-Man.}
 }
+\value{
+Returns a \code{tibble} with ghost status as a column along side coordinates.
+}
 \description{
 Compute a ghost status, \emph{i.e.}, normal, weak or eaten.
 }

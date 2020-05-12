@@ -9,6 +9,9 @@ compute_pacman_coord(data)
 \arguments{
 \item{data}{A \code{data.frame} with the coordinates of Pac-Man moves.}
 }
+\value{
+Returns a \code{tibble} of cartesian coordinates and Pac-Man direction.
+}
 \description{
 Compute Pac-Man Coordinates
 }

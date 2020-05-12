@@ -6,6 +6,8 @@
 #' @param pacman_moves Pac-Man computed moves.
 #' @param bonus_points_eaten Computed datga for points eaten by Pac-Man.
 #'
+#' @return Returns a `tibble` with ghost status as a column along side coordinates.
+#'
 #' @export
 compute_ghost_status <- function(ghost, pacman_moves, bonus_points_eaten) {
   ghosts_vulnerability <- bonus_points_eaten %>%
