@@ -11,6 +11,9 @@ compute_points_eaten(bonus_points, pacman_moves)
 
 \item{pacman_moves}{Pac-Man computed moves.}
 }
+\value{
+Returns a \code{tibble} with the coordinates of point eaten by Pac-Man.
+}
 \description{
 Compute Point Eaten by Pac-Man
 }

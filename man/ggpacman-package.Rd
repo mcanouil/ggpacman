@@ -7,6 +7,8 @@
 \title{ggpacman: A 'ggplot2' and 'gganimate' Version of Pac-Man}
 \description{
 A funny coding challenge to reproduce the game Pac-Man using 'ggplot2' and 'gganimate'.
+    It provides a pre-defined moves set for Pac-Man and the ghosts for the first level of the
+    game Pac-Man as well as polygon datasets to draw ghosts in 'ggplot2'.
 }
 \seealso{
 Useful links:

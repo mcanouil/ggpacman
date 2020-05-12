@@ -2,6 +2,8 @@
 #'
 #' @param data A `data.frame` with the coordinates of Ghost moves.
 #'
+#' @return Returns a `tibble` of cartesian coordinates.
+#'
 #' @export
 compute_ghost_coord <- function(data) {
   data %>%
