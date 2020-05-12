@@ -9,6 +9,9 @@ compute_ghost_coord(data)
 \arguments{
 \item{data}{A \code{data.frame} with the coordinates of Ghost moves.}
 }
+\value{
+Returns a \code{tibble} of cartesian coordinates.
+}
 \description{
 Compute Ghost Coordinates
 }

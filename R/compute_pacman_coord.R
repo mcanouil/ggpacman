@@ -2,6 +2,8 @@
 #'
 #' @param data A `data.frame` with the coordinates of Pac-Man moves.
 #'
+#' @return Returns a `tibble` of cartesian coordinates and Pac-Man direction.
+#'
 #' @export
 compute_pacman_coord <- function(data) {
   pacman_state <- dplyr::tribble(
