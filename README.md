@@ -814,26 +814,26 @@ blinky_ghost <- blinky_ghost %>%
     #> # A tibble: 20 x 12
     #>        x     y colour    X0    Y0 state_x state_y direction state  step  noise_x
     #>    <dbl> <dbl> <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>
-    #>  1     0     0 Blinky     0     0      NA      NA middle        1     1  0.0125 
-    #>  2     0     0 Blinky     0     0      NA      NA middle        2     2  0.0491 
-    #>  3     0     0 Blinky     0     0      NA      NA middle        3     3  0.0391 
-    #>  4     0     0 Blinky     0     0      NA      NA middle        4     4 -0.0456 
-    #>  5     1     0 Blinky     1     0       1       0 right         1     5  0.00626
-    #>  6     1     0 Blinky     1     0       1       0 right         2     6  0.0313 
-    #>  7     1     0 Blinky     1     0       1       0 right         3     7  0.0240 
-    #>  8     1     0 Blinky     1     0       1       0 right         4     8 -0.0949 
-    #>  9     1     1 Blinky     1     1       0       1 up            1     9 -0.0518 
-    #> 10     1     1 Blinky     1     1       0       1 up            2    10  0.0307 
-    #> 11     1     1 Blinky     1     1       0       1 up            3    11  0.0747 
-    #> 12     1     1 Blinky     1     1       0       1 up            4    12  0.0567 
-    #> 13     0     1 Blinky     0     1      -1       0 left          1    13 -0.0393 
-    #> 14     0     1 Blinky     0     1      -1       0 left          2    14  0.0255 
-    #> 15     0     1 Blinky     0     1      -1       0 left          3    15  0.0729 
-    #> 16     0     1 Blinky     0     1      -1       0 left          4    16 -0.0393 
-    #> 17     0     0 Blinky     0     0       0      -1 down          1    17  0.0951 
-    #> 18     0     0 Blinky     0     0       0      -1 down          2    18 -0.00228
-    #> 19     0     0 Blinky     0     0       0      -1 down          3    19 -0.0403 
-    #> 20     0     0 Blinky     0     0       0      -1 down          4    20  0.0438 
+    #>  1     0     0 Blinky     0     0      NA      NA middle        1     1 -6.24e-2
+    #>  2     0     0 Blinky     0     0      NA      NA middle        2     2  2.92e-2
+    #>  3     0     0 Blinky     0     0      NA      NA middle        3     3 -5.31e-3
+    #>  4     0     0 Blinky     0     0      NA      NA middle        4     4  1.07e-2
+    #>  5     1     0 Blinky     1     0       1       0 right         1     5  4.17e-4
+    #>  6     1     0 Blinky     1     0       1       0 right         2     6 -1.31e-2
+    #>  7     1     0 Blinky     1     0       1       0 right         3     7 -3.48e-2
+    #>  8     1     0 Blinky     1     0       1       0 right         4     8 -9.33e-2
+    #>  9     1     1 Blinky     1     1       0       1 up            1     9 -6.49e-2
+    #> 10     1     1 Blinky     1     1       0       1 up            2    10  1.00e-1
+    #> 11     1     1 Blinky     1     1       0       1 up            3    11  5.60e-2
+    #> 12     1     1 Blinky     1     1       0       1 up            4    12  8.30e-2
+    #> 13     0     1 Blinky     0     1      -1       0 left          1    13 -5.52e-2
+    #> 14     0     1 Blinky     0     1      -1       0 left          2    14  2.08e-2
+    #> 15     0     1 Blinky     0     1      -1       0 left          3    15 -8.39e-2
+    #> 16     0     1 Blinky     0     1      -1       0 left          4    16  1.05e-2
+    #> 17     0     0 Blinky     0     0       0      -1 down          1    17 -1.73e-2
+    #> 18     0     0 Blinky     0     0       0      -1 down          2    18 -3.41e-4
+    #> 19     0     0 Blinky     0     0       0      -1 down          3    19  2.12e-2
+    #> 20     0     0 Blinky     0     0       0      -1 down          4    20 -3.38e-2
     #> # ... with 1 more variable: noise_y <dbl>
 
 Then, I added (*in a weird way I might say*) the polygons coordinates
@@ -869,28 +869,28 @@ blinky_ghost <- blinky_ghost %>%
 ```
 
     #> # A tibble: 20 x 12
-    #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
-    #>    <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
-    #>  1 Blinky     0     0      NA      NA middle        1     1  0.0125   0.0191 
-    #>  2 Blinky     0     0      NA      NA middle        2     2  0.0491   0.0343 
-    #>  3 Blinky     0     0      NA      NA middle        3     3  0.0391   0.136  
-    #>  4 Blinky     0     0      NA      NA middle        4     4 -0.0456   0.0425 
-    #>  5 Blinky     1     0       1       0 right         1     5  0.00626  0.0922 
-    #>  6 Blinky     1     0       1       0 right         2     6  0.0313   0.115  
-    #>  7 Blinky     1     0       1       0 right         3     7  0.0240  -0.0222 
-    #>  8 Blinky     1     0       1       0 right         4     8 -0.0949   0.0413 
-    #>  9 Blinky     1     1       0       1 up            1     9 -0.0518  -0.118  
-    #> 10 Blinky     1     1       0       1 up            2    10  0.0307  -0.0947 
-    #> 11 Blinky     1     1       0       1 up            3    11  0.0747   0.00395
-    #> 12 Blinky     1     1       0       1 up            4    12  0.0567   0.0470 
-    #> 13 Blinky     0     1      -1       0 left          1    13 -0.0393  -0.0458 
-    #> 14 Blinky     0     1      -1       0 left          2    14  0.0255  -0.0399 
-    #> 15 Blinky     0     1      -1       0 left          3    15  0.0729   0.105  
-    #> 16 Blinky     0     1      -1       0 left          4    16 -0.0393  -0.0880 
-    #> 17 Blinky     0     0       0      -1 down          1    17  0.0951   0.0423 
-    #> 18 Blinky     0     0       0      -1 down          2    18 -0.00228 -0.0323 
-    #> 19 Blinky     0     0       0      -1 down          3    19 -0.0403   0.0470 
-    #> 20 Blinky     0     0       0      -1 down          4    20  0.0438   0.00741
+    #>    colour    X0    Y0 state_x state_y direction state  step   noise_x   noise_y
+    #>    <chr>  <dbl> <dbl>   <dbl>   <dbl> <chr>     <int> <int>     <dbl>     <dbl>
+    #>  1 Blinky     0     0      NA      NA middle        1     1 -0.0624   -0.0881  
+    #>  2 Blinky     0     0      NA      NA middle        2     2  0.0292   -0.0585  
+    #>  3 Blinky     0     0      NA      NA middle        3     3 -0.00531   0.0195  
+    #>  4 Blinky     0     0      NA      NA middle        4     4  0.0107    0.0423  
+    #>  5 Blinky     1     0       1       0 right         1     5  0.000417 -0.0434  
+    #>  6 Blinky     1     0       1       0 right         2     6 -0.0131    0.00256 
+    #>  7 Blinky     1     0       1       0 right         3     7 -0.0348    0.120   
+    #>  8 Blinky     1     0       1       0 right         4     8 -0.0933    0.0500  
+    #>  9 Blinky     1     1       0       1 up            1     9 -0.0649   -0.0422  
+    #> 10 Blinky     1     1       0       1 up            2    10  0.100    -0.0267  
+    #> 11 Blinky     1     1       0       1 up            3    11  0.0560    0.132   
+    #> 12 Blinky     1     1       0       1 up            4    12  0.0830   -0.0670  
+    #> 13 Blinky     0     1      -1       0 left          1    13 -0.0552   -0.0523  
+    #> 14 Blinky     0     1      -1       0 left          2    14  0.0208   -0.0946  
+    #> 15 Blinky     0     1      -1       0 left          3    15 -0.0839   -0.0187  
+    #> 16 Blinky     0     1      -1       0 left          4    16  0.0105   -0.0735  
+    #> 17 Blinky     0     0       0      -1 down          1    17 -0.0173    0.0310  
+    #> 18 Blinky     0     0       0      -1 down          2    18 -0.000341  0.0343  
+    #> 19 Blinky     0     0       0      -1 down          3    19  0.0212   -0.000567
+    #> 20 Blinky     0     0       0      -1 down          4    20 -0.0338    0.00538 
     #> # ... with 2 more variables: body <list>, eyes <list>
 
 For ease, it is now a call to one function directly on the poition
@@ -1076,7 +1076,7 @@ ggpacman::compute_ghost_status
 #>         "_eaten"), grepl("weak", .data[["colour"]]) & .data[["already_eaten"]] ~ 
 #>         .data[["ghost_name"]], TRUE ~ .data[["colour"]]))
 #> }
-#> <bytecode: 0x000000001e361268>
+#> <bytecode: 0x000000001d5d4868>
 #> <environment: namespace:ggpacman>
 ```
 
@@ -1187,18 +1187,18 @@ blinky_moves <- ggpacman::compute_ghost_coord(blinky_ghost)
 ```
 
     #> # A tibble: 48 x 12
-    #>    colour    X0    Y0 state_x state_y direction state  step noise_x  noise_y
-    #>    <chr>  <int> <dbl>   <dbl>   <dbl> <chr>     <int> <int>   <dbl>    <dbl>
-    #>  1 Blinky     1     0      NA      NA middle        1     1 -0.0176 -0.0417 
-    #>  2 Blinky     1     0      NA      NA middle        2     2 -0.0298 -0.0716 
-    #>  3 Blinky     1     0      NA      NA middle        3     3  0.0231 -0.00965
-    #>  4 Blinky     1     0      NA      NA middle        4     4  0.0316  0.0543 
-    #>  5 Blinky     2     0       1       0 right         1     5  0.0651  0.0730 
-    #>  6 Blinky     2     0       1       0 right         2     6 -0.0288  0.0166 
-    #>  7 Blinky     2     0       1       0 right         3     7 -0.0375 -0.0299 
-    #>  8 Blinky     2     0       1       0 right         4     8  0.0829 -0.0121 
-    #>  9 Blinky     3     0       1       0 right         1     9 -0.0206  0.0845 
-    #> 10 Blinky     3     0       1       0 right         2    10 -0.0153 -0.0463 
+    #>    colour    X0    Y0 state_x state_y direction state  step  noise_x  noise_y
+    #>    <chr>  <int> <dbl>   <dbl>   <dbl> <chr>     <int> <int>    <dbl>    <dbl>
+    #>  1 Blinky     1     0      NA      NA middle        1     1  0.0586   0.00214
+    #>  2 Blinky     1     0      NA      NA middle        2     2 -0.0440   0.0649 
+    #>  3 Blinky     1     0      NA      NA middle        3     3 -0.0482   0.0312 
+    #>  4 Blinky     1     0      NA      NA middle        4     4  0.0670  -0.0131 
+    #>  5 Blinky     2     0       1       0 right         1     5 -0.0122   0.00187
+    #>  6 Blinky     2     0       1       0 right         2     6 -0.0466   0.0551 
+    #>  7 Blinky     2     0       1       0 right         3     7 -0.0161  -0.0593 
+    #>  8 Blinky     2     0       1       0 right         4     8  0.00587  0.0462 
+    #>  9 Blinky     3     0       1       0 right         1     9 -0.0362  -0.00693
+    #> 10 Blinky     3     0       1       0 right         2    10  0.0172   0.0213 
     #> # ... with 38 more rows, and 2 more variables: body <list>, eyes <list>
 
 ``` r
