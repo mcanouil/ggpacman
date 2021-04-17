@@ -26,8 +26,8 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/ggpacman)](https://CRAN.R-project.org/package=ggpacman)
 <!-- badges: end -->
 
-The goal of `ggpacman` is to ...
-Build a GIF of the game Pac-Man (*not to develop an R version of Pac-Man ...*).
+The goal of `ggpacman` is to ...  
+Make a GIF of the game Pac-Man (*not to develop an R version of Pac-Man ...*).
 
 ## Installation
 
@@ -81,7 +81,7 @@ But, I am going to go through my code here (you might be interested to actually 
 5. [How Pac-Man interacts with the maze?](#how-pac-man-interacts-with-the-maze)
     1. [Bonus points](#bonus-points)
     2. [Ghost `"weak"` and `"eaten"` states](#ghost-weak-and-eaten-states)
-6. [Plot time](#plot-time)
+6. [Plot time](#Plot-time-to-summarise-a-little-or-a-lot)
 
 ### The packages
 
@@ -957,7 +957,8 @@ animate(
 )
 ```
 
-### Plot time ([o summarise a little (or a lot).
+### Plot time (to summarise a little (or a lot))
+
 In the current version, nearly everything is either a dataset or a function and could be used like this.
 
 1. Load and compute the data.
