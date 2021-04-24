@@ -691,7 +691,8 @@ ggplot() +
 ![](man/figures/README-ghost-body-plot-1.png)<!-- -->
 
 *Note: `ghost_body` is a dataset of `ggpacman`
-(`data("ghost_body", package = "ggpacman")`).* *Note: `ghost_body`
+(`data("ghost_body", package = "ggpacman")`).*  
+*Note: `ghost_body`
 definitely needs some code refactoring.*
 
 #### Eyes
