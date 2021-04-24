@@ -170,5 +170,5 @@ animate(
   res = 200,
   bg = "transparent",
   duration = 5,
-  renderer = gifski_renderer(file = here::here("man", "figures", "ggpacman.gif"))
+  renderer = gifski_renderer(file = here::here("man", "figures", "ggpacman2.gif"))
 )

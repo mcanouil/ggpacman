@@ -254,7 +254,7 @@ base_layer +
 ```
 
 The maze is slowly appearing, but surely.
-As I wrote earlier, the first level is symmetrical, so I used my left lines `left_segments` to compute all the lignes on the right `right_segments`.
+As I wrote earlier, the first level is symmetrical, so I used my left lines `left_segments` to compute all the lines on the right `right_segments`.
 
 ```{r right}
 right_segments <-  mutate(
@@ -734,7 +734,7 @@ blinky_ghost <- blinky_ghost %>%
 blinky_ghost
 ```
 
-For ease, it is now a call to one function directly on the poition matrix of a ghost.
+For ease, it is now a call to one function directly on the potion matrix of a ghost.
 
 ```{r blinky-moves}
 blinky_ghost <- tibble(x = c(0, 1, 1, 0, 0), y = c(0, 0, 1, 1, 0), colour = "Blinky")
@@ -832,7 +832,7 @@ maze_layer_points <- maze_layer +
 maze_layer_points
 ```
 
-A new animation to see, how the new geometry is overlpping the previous one as `step` increases.
+A new animation to see, how the new geometry is overlapping the previous one as `step` increases.
 
 ```{r points-eaten-animated}
 animated_points <- maze_layer_points + transition_manual(step)
@@ -856,7 +856,7 @@ animate(
 
 The ghosts were more tricky (I know, they are ghosts ...).
 
-I first retrieved all the positions wereh a `"big"` bonus point was eaten by Pac-Man.
+I first retrieved all the positions where a `"big"` bonus point was eaten by Pac-Man.
 
 ```{r vulnerability}
 ghosts_vulnerability <- bonus_points_eaten %>%
@@ -933,7 +933,7 @@ blinky_plot <- base_layer +
 blinky_plot
 ```
 
-I am sure, you remember all the colours and their mapped values from the beginning, so you probably won't need the following to understand of the ghost disappaered.
+I am sure, you remember all the colours and their mapped values from the beginning, so you probably won't need the following to understand of the ghost disappeared.
 
 ```{r reminder-colours, eval = FALSE}
 "Blinky" = "red", "Blinky_weak" = "blue", "Blinky_eaten" = "transparent",
