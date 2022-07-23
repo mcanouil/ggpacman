@@ -10,7 +10,7 @@ Authors@R:
 Description: A funny coding challenge to reproduce the game Pac-Man using 'ggplot2' and 'gganimate'.
     It provides a pre-defined moves set for Pac-Man and the ghosts for the first level of the
     game Pac-Man as well as polygon datasets to draw ghosts in 'ggplot2'.
-License: GPL-3
+License: MIT + file LICENSE
 URL: https://github.com/mcanouil/pacman
 BugReports: https://github.com/mcanouil/pacman/issues
 Depends: R (>= 3.6.0)
