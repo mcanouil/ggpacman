@@ -1,6 +1,6 @@
 Package: ggpacman
 Title: A 'ggplot2' and 'gganimate' Version of Pac-Man
-Version: 0.1.1
+Version: 1.0.0
 Authors@R: 
     person(given = "Mickaël",
            family = "Canouil",

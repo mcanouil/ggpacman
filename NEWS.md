@@ -1,11 +1,10 @@
-# ggpacman 0.1.1
-
+# ggpacman 1.0.0
 ## Chores
 
 - In `DESCRIPTION`,
   - chore: update email address.
 
-**Full Changelog**: <https://github.com/mcanouil/ggpacman/compare/v0.1.0...v0.1.1>
+**Full Changelog**: <https://github.com/mcanouil/ggpacman/compare/v0.1.0...v1.0.0>
 
 # ggpacman 0.1.0
 
