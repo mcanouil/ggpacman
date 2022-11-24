@@ -5,7 +5,7 @@ Authors@R:
     person(given = "Mickaël",
            family = "Canouil",
            role = c("aut", "cre"),
-           email = "mickael.canouil@cnrs.fr",
+           email = "mickael@canouil.dev",
            comment = c(ORCID = "0000-0002-3396-4549"))
 Description: A funny coding challenge to reproduce the game Pac-Man using 'ggplot2' and 'gganimate'.
     It provides a pre-defined moves set for Pac-Man and the ghosts for the first level of the
