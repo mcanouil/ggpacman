@@ -19,7 +19,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Mickaël Canouil \email{***REMOVED***} (\href{https://orcid.org/0000-0002-3396-4549}{ORCID})
+\strong{Maintainer}: Mickaël Canouil \email{mickael.canouil@cnrs.fr} (\href{https://orcid.org/0000-0002-3396-4549}{ORCID})
 
 }
 \keyword{internal}
